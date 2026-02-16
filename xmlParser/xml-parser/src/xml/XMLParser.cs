@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using xml_parser.src.xml;
 
 namespace XmlParser.src.xml
 {
@@ -17,10 +19,12 @@ namespace XmlParser.src.xml
     {
         private FileInfo XMLFile;
         private StringBuilder content;
-        int xmlDecLen = 5;
-        int signleCharLen = 1;
-        int versionLen = 7;
-        char[] quotations = new char[] { '\'', '\"' };
+        private int xmlDecLen = 5;
+        private int singleCharLen = 1;
+        private int versionLen = 7;
+        private int equalsLen = 3;
+        private IList<string> quotations = new List<string> { "'", "\"" };
+        
 
         public string Content { get { return content.ToString(); } }
 
@@ -49,11 +53,11 @@ namespace XmlParser.src.xml
                             continue;
                         flag = 1;
                         reader.Skip(xmlDecLen);
-                        reader.Skip(signleCharLen);
+                        reader.Skip(singleCharLen);
                         if (reader.Read(versionLen) != "version")
                             throw new Exception("Xml declaration does not start with a version declaration.");
-                        reader.Skip(signleCharLen);
-                        if (!reader.Read(signleCharLen).SequenceEqual(quotations))
+                        reader.Skip(singleCharLen);
+                        if (!quotations.Contains(reader.Read(singleCharLen)))
                             throw new Exception("Propertie is not in quotations");
 
                     }
@@ -62,9 +66,39 @@ namespace XmlParser.src.xml
             return null;
         }
 
-        private KeyValuePair<string, string> ReadProperty(FileReader reader)
+        private Pair<string, string> ReadProperty(FileReader reader)
         {
+            Pair<string, string> result;
+            
 
+            string key = "";
+            string current;
+            string tmp;
+            while (true)
+            {
+                tmp = reader.Peak(3);
+                
+                current = reader.Read();
+                key += current;
+            }
+
+
+
+            if (reader.Peak() != "\"" || reader.Peak() != "'")
+                throw new Exception("Xml property seems to be malformed.");
+            reader.Skip();
+            string value = "";
+            // we do an infinite loop here to make it easier when breaking out of it
+            while(true)
+            {
+                current = reader.Read();
+                if (quotations.Contains(current))
+                    break;
+                value += current;
+            }
+
+            result = new Pair<string, string>(key, value);
+            return result;
         }
     }
 }
