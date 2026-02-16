@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace xml_parser.Properties
+namespace XmlParser.Properties
 {
 
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xml_parser.src.xml
+namespace XmlParser.src.xml
 {
     internal class FileReader
     {
@@ -28,7 +28,7 @@ namespace xml_parser.src.xml
             return read;
         }
 
-        public string Peak(int amount)
+        public string Peak(int amount = 1)
         {
             if (index + amount >= this.text.Length)
             {
@@ -37,7 +37,7 @@ namespace xml_parser.src.xml
             return this.text.Substring(index, amount);
         }
 
-        public bool Skip(int amount)
+        public bool Skip(int amount = 1)
         {
             if (index + amount >= this.text.Length)
             {

@@ -2,8 +2,9 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System;
+using XmlParser.src;
 
-namespace xml_parser
+namespace XmlParser
 {
     partial class MainWindow
     {
@@ -42,8 +43,8 @@ namespace xml_parser
             this.Content.ReadOnly = true;
             this.Content.Location = new Point(0, this.menuBar.ClientSize.Height - this.menuBarMarginSize);
             this.Content.ClientSize = new Size(width - this.scrollbarWidth, height - this.menuBar.ClientSize.Height + this.menuBarMarginSize);
-            this.Content.ForeColor = ColorScheme.colorScheme.Text;
-            this.Content.BackColor = ColorScheme.colorScheme.Primary;
+            this.Content.ForeColor = Constants.colorScheme.Text;
+            this.Content.BackColor = Constants.colorScheme.Primary;
             this.Content.BorderStyle = BorderStyle.None;
             this.Content.ScrollBars = ScrollBars.Both;
             //this.Content.
@@ -56,7 +57,7 @@ namespace xml_parser
             this.ClientSize = new Size(width, height);
             this.Name = "MainWindow";
             this.Text = "xml parser";
-            this.BackColor = ColorScheme.colorScheme.Primary;
+            this.BackColor = Constants.colorScheme.Primary;
             this.SizeChanged += new EventHandler(this.onResize);
             this.ResumeLayout(false);
             this.PerformLayout();

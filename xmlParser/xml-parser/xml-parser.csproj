@@ -64,6 +64,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\xml\FileReader.cs" />
+    <Compile Include="src\xml\Pair.cs" />
+    <Compile Include="src\xml\XMLMetaData.cs" />
     <Compile Include="src\xml\XMLObject.cs" />
     <Compile Include="src\xml\XMLParser.cs" />
     <Compile Include="TestForm.cs">

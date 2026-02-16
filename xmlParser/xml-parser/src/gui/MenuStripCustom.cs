@@ -7,9 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using xml_parser.src.xml;
+using XmlParser.src;
+using XmlParser.src.xml;
 
-namespace xml_parser
+namespace XmlParser
 {
     public partial class MenuStripCustom : MenuStrip
     {
@@ -61,20 +62,20 @@ namespace xml_parser
         {
             if (e.Button == MouseButtons.Left)
             {
-                ColorScheme.colorScheme.ChangeDarkMode();
-                main.BackColor = ColorScheme.colorScheme.Primary;
-                this.BackColor = ColorScheme.colorScheme.Secondary;
-                this.file.ForeColor = ColorScheme.colorScheme.Text;
-                this.file.BackColor = ColorScheme.colorScheme.Secondary;
-                this.settings.ForeColor = ColorScheme.colorScheme.Text;
-                this.settings.BackColor = ColorScheme.colorScheme.Secondary;
-                this.fileContent.ForeColor = ColorScheme.colorScheme.Text;
-                this.fileContent.BackColor = ColorScheme.colorScheme.Primary;
+                Constants.colorScheme.ChangeDarkMode();
+                main.BackColor = Constants.colorScheme.Primary;
+                this.BackColor = Constants.colorScheme.Secondary;
+                this.file.ForeColor = Constants.colorScheme.Text;
+                this.file.BackColor = Constants.colorScheme.Secondary;
+                this.settings.ForeColor = Constants.colorScheme.Text;
+                this.settings.BackColor = Constants.colorScheme.Secondary;
+                this.fileContent.ForeColor = Constants.colorScheme.Text;
+                this.fileContent.BackColor = Constants.colorScheme.Primary;
                 var items = new List<ToolStripMenuItem> { openFile, exit, darkMode };
                 foreach (ToolStripMenuItem item in items)
                 {
-                    item.BackColor = ColorScheme.colorScheme.Accent;
-                    item.ForeColor = ColorScheme.colorScheme.Text;
+                    item.BackColor = Constants.colorScheme.Accent;
+                    item.ForeColor = Constants.colorScheme.Text;
                 }
             }
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xml_parser.src.xml
+namespace XmlParser.src.xml
 {
     internal class XMLObject
     {

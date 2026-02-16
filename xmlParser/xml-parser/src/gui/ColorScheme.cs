@@ -5,13 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xml_parser
+namespace XmlParser
 {
     internal class ColorScheme
     {
-        // made static since we only need one colorscheme for the entire program.
-        public static readonly ColorScheme colorScheme = new ColorScheme();
-
         private bool isDarkMode = true;
 
         // dark mode colors

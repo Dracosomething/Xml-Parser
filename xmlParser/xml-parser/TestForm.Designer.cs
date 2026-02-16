@@ -1,4 +1,4 @@
-﻿namespace xml_parser
+﻿namespace XmlParser
 {
     partial class TestForm
     {

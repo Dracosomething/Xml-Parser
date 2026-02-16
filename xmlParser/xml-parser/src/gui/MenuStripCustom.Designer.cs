@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using XmlParser.src;
 
-namespace xml_parser
+namespace XmlParser
 {
     partial class MenuStripCustom
     {
@@ -61,7 +62,7 @@ namespace xml_parser
             // menuBar
             //
             this.Items.AddRange(new ToolStripItem[] { file, settings });
-            this.BackColor = ColorScheme.colorScheme.Secondary;
+            this.BackColor = Constants.colorScheme.Secondary;
             this.Size = new Size(screenWidth, barHeight);
             this.Location = new Point(0, 0);
             this.Renderer = new MenuStripCustomRenderer();
@@ -74,8 +75,8 @@ namespace xml_parser
                 this.exit });
             this.file.Size = new Size(width, height * this.file.DropDownItems.Count);
             this.file.Font = this.font;
-            this.file.ForeColor = ColorScheme.colorScheme.Text;
-            this.file.BackColor = ColorScheme.colorScheme.Secondary;
+            this.file.ForeColor = Constants.colorScheme.Text;
+            this.file.BackColor = Constants.colorScheme.Secondary;
             
             //
             // settings
@@ -84,8 +85,8 @@ namespace xml_parser
                 this.darkMode });
             this.settings.Size = new Size(width, height * this.settings.DropDownItems.Count);
             this.settings.Font = this.font;
-            this.settings.ForeColor = ColorScheme.colorScheme.Text;
-            this.settings.BackColor = ColorScheme.colorScheme.Secondary;
+            this.settings.ForeColor = Constants.colorScheme.Text;
+            this.settings.BackColor = Constants.colorScheme.Secondary;
 
             this.darkMode.MouseUp += new MouseEventHandler(this.onClickDarkItem);
             this.openFile.MouseUp += new MouseEventHandler(this.onClickOpenFile);
@@ -95,8 +96,8 @@ namespace xml_parser
             {
                 item.Font = this.font;
                 item.Size = new Size(width, height);
-                item.BackColor = ColorScheme.colorScheme.Accent;
-                item.ForeColor = ColorScheme.colorScheme.Text;
+                item.BackColor = Constants.colorScheme.Accent;
+                item.ForeColor = Constants.colorScheme.Text;
             }
 
             this.ResumeLayout(false);
