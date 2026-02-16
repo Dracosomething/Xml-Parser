@@ -44,21 +44,12 @@ namespace XmlParser.src.xml
             {
                 var reader = new FileReader(XMLFile);
                 int flag = 0;
+                XMLMetaData metaData = new XMLMetaData();
                 
                 while (!reader.EndOfFile())
                 {
-                    if (flag == 0)
+                    for (;;)
                     {
-                        if (reader.Peak(xmlDecLen) != "<?xml")
-                            continue;
-                        flag = 1;
-                        reader.Skip(xmlDecLen);
-                        reader.Skip(singleCharLen);
-                        if (reader.Read(versionLen) != "version")
-                            throw new Exception("Xml declaration does not start with a version declaration.");
-                        reader.Skip(singleCharLen);
-                        if (!quotations.Contains(reader.Read(singleCharLen)))
-                            throw new Exception("Propertie is not in quotations");
 
                     }
                 }

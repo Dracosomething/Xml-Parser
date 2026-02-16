@@ -7,11 +7,11 @@
       "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\gui\\colorscheme.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\xmlparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\xmlparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\xmlparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -59,8 +59,7 @@
               "RelativeToolTip": "xml-parser\\src\\Constants.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAKAAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T09:41:08.288Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-16T09:41:08.288Z"
             },
             {
               "$type": "Document",
@@ -72,8 +71,7 @@
               "RelativeToolTip": "xml-parser\\src\\xml\\Pair.cs",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAAAsAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T08:39:50.389Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-16T08:39:50.389Z"
             },
             {
               "$type": "Document",
@@ -85,8 +83,7 @@
               "RelativeToolTip": "xml-parser\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-13T11:59:22.022Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-13T11:59:22.022Z"
             },
             {
               "$type": "Document",
@@ -98,8 +95,7 @@
               "RelativeToolTip": "xml-parser\\src\\xml\\XMLParser.cs",
               "ViewState": "AgIAACIAAAAAAAAAAAAkwCwAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-13T08:21:19.483Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-13T08:21:19.483Z"
             },
             {
               "$type": "Document",

@@ -64,11 +64,19 @@
     <Compile Include="src\gui\render\MenuStripCustomRenderer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\xml\dtd\DTDAttList.cs" />
+    <Compile Include="src\xml\dtd\DTDElement.cs" />
+    <Compile Include="src\xml\dtd\DTDEntity.cs" />
+    <Compile Include="src\xml\dtd\DTDNotation.cs" />
+    <Compile Include="src\xml\dtd\DTDParser.cs" />
+    <Compile Include="src\xml\dtd\DTDSchema.cs" />
+    <Compile Include="src\xml\dtd\DTDSequence.cs" />
     <Compile Include="src\xml\FileReader.cs" />
     <Compile Include="src\xml\Pair.cs" />
     <Compile Include="src\xml\XMLMetaData.cs" />
     <Compile Include="src\xml\XMLObject.cs" />
     <Compile Include="src\xml\XMLParser.cs" />
+    <Compile Include="src\xml\XMLProcessInstructions.cs" />
     <Compile Include="TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
