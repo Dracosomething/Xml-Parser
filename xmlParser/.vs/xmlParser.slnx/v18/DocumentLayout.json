@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdnotation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdnotation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\xmlmetadata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\xmlmetadata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\filereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\filereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\xmlparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -23,44 +23,32 @@
       "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\xmlobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdattlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdattlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdelement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdelement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdschema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdschema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\dtd\\dtdsequence.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdsequence.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\gui\\colorscheme.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\gui\\colorscheme.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\xml\\xmlprocessinstructions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\xmlprocessinstructions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\xmlprocessinstructions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\dtdnotation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdnotation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\dtdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\pair.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\pair.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\dtdelement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\dtd\\dtdelement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\gui\\colorscheme.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\gui\\colorscheme.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|c:\\users\\alias\\documents\\stage\\xml_parser\\xmlparser\\xml-parser\\src\\pair.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\pair.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\xmlmetadata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2BE4BEB5-066C-49BB-89AC-FBFBC0F7A37F}|xml-parser\\xml-parser.csproj|solutionrelative:xml-parser\\src\\xml\\xmlmetadata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -70,76 +58,76 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "Constants.cs",
+              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\Constants.cs",
+              "RelativeDocumentMoniker": "xml-parser\\src\\Constants.cs",
+              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\Constants.cs",
+              "RelativeToolTip": "xml-parser\\src\\Constants.cs",
+              "ViewState": "AgIAAHEAAAAAAAAAAAAewIMAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-17T14:51:00.675Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FileReader.cs",
+              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\FileReader.cs",
+              "RelativeDocumentMoniker": "xml-parser\\src\\xml\\FileReader.cs",
+              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\FileReader.cs",
+              "RelativeToolTip": "xml-parser\\src\\xml\\FileReader.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAgwDMAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-17T13:49:08.465Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "DTDNotation.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDNotation.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDNotation.cs",
               "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDNotation.cs",
               "RelativeToolTip": "xml-parser\\src\\xml\\dtd\\DTDNotation.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAkwCkAAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAAQAAAAAAAAAAAArwCQAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-16T15:50:50.471Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "DTDEntity.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDEntity.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDEntity.cs",
               "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDEntity.cs",
               "RelativeToolTip": "xml-parser\\src\\xml\\dtd\\DTDEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwBAAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-16T15:49:22.86Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "DTDAttList.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDAttList.cs",
-              "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDAttList.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDAttList.cs",
-              "RelativeToolTip": "xml-parser\\src\\xml\\dtd\\DTDAttList.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAYwCoAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T15:43:51.363Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "DTDParser.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDParser.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDParser.cs",
               "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDParser.cs",
               "RelativeToolTip": "xml-parser\\src\\xml\\dtd\\DTDParser.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAAwCQAAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAHMAAAAAAAAAAAAYwM4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-16T15:40:37.709Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "DTDSequence.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDSequence.cs",
-              "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDSequence.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDSequence.cs",
-              "RelativeToolTip": "xml-parser\\src\\xml\\dtd\\DTDSequence.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAxwBsAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T15:20:57.849Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "DTDElement.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDElement.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDElement.cs",
@@ -152,20 +140,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "DTDSchema.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDSchema.cs",
-              "RelativeDocumentMoniker": "xml-parser\\src\\xml\\dtd\\DTDSchema.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\dtd\\DTDSchema.cs",
-              "RelativeToolTip": "xml-parser\\src\\xml\\dtd\\DTDSchema.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T14:59:30.424Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 5,
               "Title": "XMLProcessInstructions.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\XMLProcessInstructions.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\xml\\XMLProcessInstructions.cs",
@@ -178,7 +153,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 11,
               "Title": "XMLMetaData.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\XMLMetaData.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\xml\\XMLMetaData.cs",
@@ -186,12 +161,11 @@
               "RelativeToolTip": "xml-parser\\src\\xml\\XMLMetaData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T14:47:46.844Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-16T14:47:46.844Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 9,
               "Title": "ColorScheme.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\gui\\ColorScheme.cs",
               "RelativeDocumentMoniker": "xml-parser\\src\\gui\\ColorScheme.cs",
@@ -204,39 +178,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Constants.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\Constants.cs",
-              "RelativeDocumentMoniker": "xml-parser\\src\\Constants.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\Constants.cs",
-              "RelativeToolTip": "xml-parser\\src\\Constants.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKAAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T09:41:08.288Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 10,
               "Title": "Pair.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\Pair.cs",
-              "RelativeDocumentMoniker": "xml-parser\\src\\xml\\Pair.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\xml\\Pair.cs",
-              "RelativeToolTip": "xml-parser\\src\\xml\\Pair.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAsAAAAeAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\Pair.cs",
+              "RelativeDocumentMoniker": "xml-parser\\src\\Pair.cs",
+              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\src\\Pair.cs",
+              "RelativeToolTip": "xml-parser\\src\\Pair.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T08:39:50.389Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\Program.cs",
-              "RelativeDocumentMoniker": "xml-parser\\Program.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\xml_parser\\xmlParser\\xml-parser\\Program.cs",
-              "RelativeToolTip": "xml-parser\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-13T11:59:22.022Z"
+              "WhenOpened": "2026-02-16T08:39:50.389Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",

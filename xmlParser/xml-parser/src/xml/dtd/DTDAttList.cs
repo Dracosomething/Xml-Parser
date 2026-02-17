@@ -16,7 +16,8 @@ namespace xml_parser.src.xml.dtd
         ENTITIES,
         NMTOKEN,
         NMTOKENS,
-        NOTATION
+        NOTATION,
+        ENUMERATION
     }
 
     enum DTDDeclarationType
@@ -29,18 +30,29 @@ namespace xml_parser.src.xml.dtd
     internal class DTDAttList
     {
         private string elementName;
-        private string name;
-        private DTDDataType dataType;
-        private DTDDeclarationType declarationType;
-        private string data;
+        private List<DTDAttribute> attributes;
 
-        public DTDAttList(string elementName, string name, DTDDataType dataType, DTDDeclarationType declarationType, string data)
+        public DTDAttList(string elementName)
         {
             this.elementName = elementName;
-            this.name = name;
-            this.dataType = dataType;
-            this.declarationType = declarationType;
-            this.data = data;
+            this.attributes = new List<DTDAttribute>();
+        }
+
+        public void Add(DTDAttribute item) 
+        {
+            attributes.Add(item);
+        }
+
+        public DTDAttribute this[int i]
+        {
+            get
+            {
+                return this.attributes[i]; 
+            }
+            set
+            {
+                this.attributes[i] = value;
+            }
         }
     }
 }

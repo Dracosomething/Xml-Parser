@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -10,6 +12,9 @@ namespace XmlParser.src
     {
         // made static since we only need one colorscheme for the entire program.
         public static readonly ColorScheme colorScheme = new ColorScheme();
+
+        // For http requests
+        public static readonly HttpClient httpClient = new HttpClient();
 
         // Document
         public static readonly string document = $"({prolog})({element})({misc})*";
@@ -33,8 +38,8 @@ namespace XmlParser.src
         public static readonly string entityValue = $"(\\\"([^%&\\\"]|({peReference})|({reference}))*\\\")|(\\'([^%&\\']|({peReference})|({reference}))*\\')";
         public static readonly string attValue = $"(\\\"([^<&\\\"]|({reference}))*\\\")|(\\'([^<&\\']|({reference}))*\\')";
         public static readonly string systemLiteral = $"(\\\"[^\\\"]* \\\")|(\\'[^\\']*\\')";
-        public static readonly string pubidLiteral = $"(\\\"({pubidChar})*\\\")|(\\'({pubidChar.Replace("'", "")})*\\')";
         public static readonly string pubidChar = "\\s|\\r|\\n|[a-zA-Z0-9]|[-'()+,./:=?;!*#@$_%]";
+        public static readonly string pubidLiteral = $"(\\\"({pubidChar})*\\\")|(\\'({pubidChar.Replace("'", "")})*\\')";
 
         // Character Data
         public static readonly string charData = "[^<&]*(?![^<&]*]]>[^<&]*)";
@@ -124,7 +129,7 @@ namespace XmlParser.src
         public static readonly string conditionalSect = $"({includeSect})|({ignoreSect})";
         public static readonly string includeSect = $"<!\\[{space}?INCLUDE{space}?\\[{extSubsetDecl}]]>";
         public static readonly string ignoreSect = $"'<!\\[{space}?IGNORE{space}?\\[{ignoreSectContents}*]]>";
-        public static readonly string ignoreSectContents = $"{ignore}(<!\\[{ignoreSectContents}]]>{ignore})*";
+        public static readonly string ignoreSectContents = $"{ignore}({ignore})*";
         public static readonly string ignore = $"{chararacter.Replace(")*", "(?!(<!\\[)|(]]>)))*")}{chararacter.Replace("*", "")}";
 
         // Character Reference
@@ -164,6 +169,19 @@ namespace XmlParser.src
         {
             Regex replace = new Regex(regex);
             return replace.Replace(value, replacement);
+        }
+
+        public static bool RegexMatch(string value, string regex)
+        {
+            Regex reg = new Regex(regex);
+            return reg.IsMatch(value);
+        }
+
+        public static int RegexCount(string value, string regex)
+        {
+            Regex reg = new Regex(regex);
+            MatchCollection matches = reg.Matches(regex);
+            return matches.Count;
         }
     }
 }

@@ -25,21 +25,18 @@ namespace xml_parser.src.xml.dtd
             this.externalID = externalId;
         }
 
-        public DTDNotation(string name, string publicID, ExternalId externalId)
+        public DTDNotation(string name, string otherString, ExternalId externalId)
         {
-            if (externalId != ExternalId.PUBLIC)
-                throw new ArgumentException();
+            switch (externalID)
+            {
+                case ExternalId.PUBLIC:
+                    this.publicID = otherString;
+                    break;
+                case ExternalId.SYSTEM:
+                    this.systemLiteral = otherString;
+                    break;
+            }
             this.name = name;
-            this.publicID = publicID;
-            this.externalID = externalId;
-        }
-
-        public DTDNotation(string name, string systemLiteral, ExternalId externalId)
-        {
-            if (externalId != ExternalId.SYSTEM)
-                throw new ArgumentException();
-            this.name = name;
-            this.systemLiteral = systemLiteral;
             this.externalID = externalId;
         }
     }

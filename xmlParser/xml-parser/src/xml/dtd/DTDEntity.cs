@@ -10,11 +10,17 @@ namespace xml_parser.src.xml.dtd
     {
         private string name;
         private string value;
+        private bool global;
 
-        public DTDEntity(string name, string value)
+        public string Name { get => name; }
+        public string Value { get => value; }
+        public bool IsGlobal { get => global; }
+
+        public DTDEntity(string name, string value, bool global)
         {
             this.name = name;
             this.value = value;
+            this.global = global;
         }
     }
 }
