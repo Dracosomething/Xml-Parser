@@ -15,7 +15,7 @@ namespace XmlParser
         [STAThread]
         static void Main()
         {
-            var parser = Task.Run(() => new DTDParser("C:\\Users\\alias\\Documents\\stage\\xml_parser\\dummy.dtd"));
+            var parser = new DTDParser("C:\\Users\\alias\\Documents\\stage\\xml_parser\\dummy.dtd");
             Console.WriteLine();
 
             Application.EnableVisualStyles();

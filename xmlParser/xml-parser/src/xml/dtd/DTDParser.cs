@@ -90,7 +90,9 @@ namespace xml_parser.src.xml.dtd
 
                 
             }
-            catch (Exception e) { return e; }
+            catch (Exception e) {
+                Console.WriteLine(e);
+                return e; }
             return null;
         }
         
@@ -100,8 +102,8 @@ namespace xml_parser.src.xml.dtd
             while (!reader.EndOfFile())
             {
                 string line = ReadParameterEntity(reader);
-                if (Constants.RegexMatch(line, Constants.comment))
-                    continue;
+                if (line == null)
+                    break;
                 switch (line)
                 {
                     case var o when Constants.RegexMatch(line, Constants.peDecl):
@@ -129,7 +131,7 @@ namespace xml_parser.src.xml.dtd
 
         private string ReadParameterEntity(FileReader reader)
         {
-            return reader.Read($@"({Constants.peReference})|({Constants.peDecl})");
+            return reader.Read($"({Constants.peReference})|({Constants.peDecl})");
         }
 
         private string ReplaceCharReferences(string text, MatchCollection matches)
@@ -239,12 +241,13 @@ namespace xml_parser.src.xml.dtd
         private DTDEntity ParseEntity(string item)
         {
             char[] spaceCharacters = new char[] { ' ', '\t', '\r', '\n' };
+
             bool global = Constants.RegexMatch(item, Constants.peDecl);
             const string entityHeader = "<!ENTITY";
             var reader = new FileReader(item);
             reader.Skip(entityHeader.Length);
             reader.SkipRegex(Constants.space);
-            if (!global){
+            if (global){
                 // skip '%' character
                 reader.Skip();
                 reader.SkipRegex(Constants.space);
@@ -252,7 +255,7 @@ namespace xml_parser.src.xml.dtd
             string name = reader.Read(Constants.name);
             reader.SkipRegex(Constants.space);
             string value;
-            if (global)
+            if (!global)
                 value = reader.Read(Constants.entityDef);
             else
                 value = reader.Read(Constants.peDef);
@@ -274,8 +277,9 @@ namespace xml_parser.src.xml.dtd
                         o = o.Remove(0, "PUBLIC".Length);
                         o = o.TrimStart(spaceCharacters);
                         string metaData = Constants.RegexExtract(o, Constants.pubidLiteral);
-                        o = Constants.RegexReplace(o, "", Constants.pubidLiteral);
+                        o = o.Remove(0, metaData.Length);
                         o = o.TrimStart(spaceCharacters);
+                        o = o.Replace("\"", "");
                         var uri = new Uri(o);
                         var parserPublic = new DTDParser(uri);
                         schema.Combine(parserPublic.Schema);

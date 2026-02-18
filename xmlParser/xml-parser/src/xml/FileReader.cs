@@ -47,14 +47,14 @@ namespace XmlParser.src.xml
         public string Read(string regex)
         {
             Match match = ReadFirstMatch(regex);
+            if (match == null)
+                return null;
             string leftOver = this.text.Substring(index);
             if (leftOver.StartsWith(match.Value))
                 return Read(match.Length);
             else
             {
-                int indexFound = match.Index;
-                int toReadAmount = this.index - indexFound;
-                return Read(toReadAmount);
+                return Read(match.Index);
             }
         }
 
@@ -76,6 +76,8 @@ namespace XmlParser.src.xml
         public bool SkipRegex(string regex)
         {
             Match match = ReadFirstMatch(regex);
+            if (match == null)
+                return false;
             string leftOver = this.text.Substring(index);
             if (leftOver.StartsWith(match.Value))
                 return Skip(match.Length);

@@ -18,44 +18,42 @@ namespace XmlParser.src
         public static readonly HttpClient httpClient = new HttpClient();
 
         // url regex
-        public static readonly string url = @"((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|" +
+        public static readonly string url = "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|" +
             "[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)";
-        public static readonly string domain = @"((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|" +
+        public static readonly string domain = "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|" +
             "[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)\\/)";
 
         // file regex
-        public static readonly string filePath = @"^(?:(?:\\.{1,2}\\/))?(?:\\w+\\/)*";
-
-        // Document
-        public static readonly string document = $@"({prolog})({element})({misc})*";
+        public static readonly string filePath = "(^(?:(?:\\.{1,2}\\/))?(?:\\w+\\/)*)";
 
         // Character Range
-        public static readonly string chararacter = @"(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD]|[𐀀-􏿿])";
+        public static readonly string chararacter = "(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD])";
 
         // White Space
         public static readonly string space = "((\\s|\\t|\\r|\\n)+)";
 
         // Names and Tokens
-        public static readonly string nameStartChar = ":|[A-Z]|_|[a-z]|[\\u00C0-\\u00D6]|[\\u00D8-\\u00F6]|[\\u00F8-#x2FF]|[\\u0370-\\u037D]|" +
-            "[\\u037F-\\u1FFF]|[\\u200C-\\u200D]|[\\u2070-\\u218F]|[\\u2C00-\\u2FEF]|[\\u3001-\\uD7FF]|[\\uF900-\\uFDCF]|[\\uFDF0-\\uFFFD]|[𐀀-󯿿]";
-        public static readonly string nameChar = $"{nameStartChar}|-|\\.|[0-9]|·|[\\u0300-\\u036F]|[\\u203F-\\u2040]";
+        public static readonly string nameStartChar = "(:|[A-Z]|_|[a-z]|[\\u00C0-\\u00D6]|[\\u00D8-\\u00F6]|[\\u00F8-\\u02FF]|[\\u0370-\\u037D]|" +
+            "[\\u037F-\\u1FFF]|[\\u200C-\\u200D]|[\\u2070-\\u218F]|[\\u2C00-\\u2FEF]|[\\u3001-\\uD7FF]|[\\uF900-\\uFDCF]|[\\uFDF0-\\uFFFD])";
+        public static readonly string nameChar = $"({nameStartChar}|-|\\.|[0-9]|·|[\\u0300-\\u036F]|[\\u203F-\\u2040])";
         public static readonly string name = $"({nameStartChar}({nameChar})*)";
-        public static readonly string names = $"{name}(\\s{name})*";
-        public static readonly string nmToken = $"({nameChar})+";
-        public static readonly string nmTokens = $"{nmToken}(\\s{nmToken})*";
+        //public static readonly string name = $"(.*)";
+        public static readonly string names = $"({name}(\\s{name})*)";
+        public static readonly string nmToken = $"(({nameChar})+)";
+        public static readonly string nmTokens = $"({nmToken}(\\s{nmToken})*)";
 
         // Literals
         public static readonly string entityValue = $"(\\\"([^%&\\\"]|({peReference})|({reference}))*\\\")|(\\'([^%&\\']|({peReference})|({reference}))*\\')";
         public static readonly string attValue = $"(\\\"([^<&\\\"]|({reference}))*\\\")|(\\'([^<&\\']|({reference}))*\\')";
-        public static readonly string systemLiteral = $"(\\\"[^\\\"]* \\\")|(\\'[^\\']*\\')";
-        public static readonly string pubidChar = "\\s|\\r|\\n|[a-zA-Z0-9]|[-'()+,./:=?;!*#@$_%]";
-        public static readonly string pubidLiteral = $"(\\\"({pubidChar})*\\\")|(\\'({pubidChar.Replace("'", "")})*\\')";
+        public static readonly string systemLiteral = $"(\\\"[^\\\"]*\\\")|(\\'[^\\']*\\')";
+        public static readonly string pubidChar = "(\\s|\\r|\\n|[a-zA-Z0-9]|[-'()+,./:=?;!*#@$_%])";
+        public static readonly string pubidLiteral = $"((\\\"({pubidChar})*\\\")|(\\'({pubidChar.Replace("'", "")})*\\'))";
 
         // Character Data
-        public static readonly string charData = "[^<&]*(?![^<&]*]]>[^<&]*)";
+        public static readonly string charData = "([^<&]*(?![^<&]*]]>[^<&]*))";
 
         // Comments
-        public static readonly string comment = $"<!--(({chararacter.Replace("-", "")})|(-({chararacter.Replace("-", "")})))*-->";
+        public static readonly string comment = $"(<!--(({chararacter.Replace("-", "")})|(-({chararacter.Replace("-", "")})))*-->)";
 
         // Processing Instructions
         public static readonly string pi = $"<\\?{piTarget}({space}({chararacter.Replace(")*", "(?!\\?>))*")}*{chararacter.Replace("*", "")}))?\\?>";
@@ -150,16 +148,16 @@ namespace XmlParser.src
         public static readonly string entityRef = $"&{name};";
         public static readonly string peReference = $"%{name};";
 
-        // Entity Declaration
-        public static readonly string entityDecl = $"({geDecl})|({peDecl})";
-        public static readonly string geDecl = $"<!ENTITY{space}{name}{space}{entityDef}{space}?>";
-        public static readonly string peDecl = $"<!ENTITY{space}%{space}{name}{space}{peDef}{space}?>";
-        public static readonly string entityDef = $"({entityValue})|({externalId}{nDataDecl}?)";
-        public static readonly string peDef = $"({entityValue})|({externalId})";
-
         // External Entity Declaration
         public static readonly string externalId = $"(SYSTEM{space}{systemLiteral})|(PUBLIC{space}{pubidLiteral}{space}{systemLiteral})";
         public static readonly string nDataDecl = $"{space}NDATA{space}{name}";
+
+        // Entity Declaration
+        public static readonly string entityDef = $"({entityValue})|({externalId}{nDataDecl}?)";
+        public static readonly string peDef = $"(({entityValue})|({externalId}))";
+        public static readonly string geDecl = $"<!ENTITY{space}{name}{space}{entityDef}{space}?>";
+        public static readonly string peDecl = $"<!ENTITY{space}%{space}{name}{space}{peDef}{space}?>";
+        public static readonly string entityDecl = $"({geDecl})|({peDecl})";
 
         // Text Declaration
         public static readonly string textDecl = $"<\\?xml{versionInfo}?{encodingDecl}{space}?\\?>";
@@ -174,6 +172,9 @@ namespace XmlParser.src
         // Notation Declarations
         public static readonly string notationDecl = $"<!NOTATION{space}{name}{space}({externalId}|{publicId}){space}?>";
         public static readonly string publicId = $"PUBLIC{space}{pubidLiteral}";
+
+        // Document
+        public static readonly string document = $"(({prolog})({element})({misc})*)";
 
         public static string RegexReplace(string value, string replacement, string regex)
         {
