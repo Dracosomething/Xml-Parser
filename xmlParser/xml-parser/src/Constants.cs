@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -16,11 +17,20 @@ namespace XmlParser.src
         // For http requests
         public static readonly HttpClient httpClient = new HttpClient();
 
+        // url regex
+        public static readonly string url = @"((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|" +
+            "[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)";
+        public static readonly string domain = @"((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|" +
+            "[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)\\/)";
+
+        // file regex
+        public static readonly string filePath = @"^(?:(?:\\.{1,2}\\/))?(?:\\w+\\/)*";
+
         // Document
-        public static readonly string document = $"({prolog})({element})({misc})*";
+        public static readonly string document = $@"({prolog})({element})({misc})*";
 
         // Character Range
-        public static readonly string chararacter = "(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD]|[𐀀-􏿿])";
+        public static readonly string chararacter = @"(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD]|[𐀀-􏿿])";
 
         // White Space
         public static readonly string space = "((\\s|\\t|\\r|\\n)+)";
@@ -167,21 +177,28 @@ namespace XmlParser.src
 
         public static string RegexReplace(string value, string replacement, string regex)
         {
-            Regex replace = new Regex(regex);
+            var replace = new Regex(regex);
             return replace.Replace(value, replacement);
         }
 
         public static bool RegexMatch(string value, string regex)
         {
-            Regex reg = new Regex(regex);
+            var reg = new Regex(regex);
             return reg.IsMatch(value);
         }
 
         public static int RegexCount(string value, string regex)
         {
-            Regex reg = new Regex(regex);
+            var reg = new Regex(regex);
             MatchCollection matches = reg.Matches(regex);
             return matches.Count;
+        }
+
+        public static string RegexExtract(string value, string regex)
+        {
+            var reg = new Regex(regex);
+            Match match = reg.Match(value);
+            return match.Value;
         }
     }
 }

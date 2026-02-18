@@ -1,0 +1,25 @@
+<!-- comment test -->
+<!ENTITY % html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!ENTITY % other SYSTEM "other.dtd">
+<!ENTITY testEntity "example">
+%html;
+%other;
+<!NOTATION gif PUBLIC "GIF 1.0">
+<!NOTATION jpg PUBLIC "JPG 1.0" "image/jpg">
+<!NOTATION png SYSTEM "image/png">
+<!ENTITY companyLogo
+         SYSTEM "http://www.liquid-technologies.com/Content/images/liquid-logo.png"
+         NDATA png>
+
+<!ELEMENT a EMPTY>
+<!ELEMENT b EMPTY>
+<!ELEMENT c ANY>
+<!ELEMENT h ANY>
+<!ELEMENT d (#PCDATA, h)>
+<!ELEMENT test (a, b+, c?)>
+<!ELEMENT testOpt (a | b | (c?, d*))>
+<!ATTLIST a test CDATA #IMPLIED testr ID #REQUIRED testf CDATA #FIXED '1.5'>
+<!ATTLIST b entTest ENTITY #REQUIRED entsTest ENTITIES #REQUIRED>
+<!ATTLIST c test IDREF #REQUIRED test2 IDREFS #REQUIRED>
+<!ATTLIST d test NMTOKEN #REQUIRED test2 NMTOKENS #REQUIRED>
+<!ATTLIST test NOTATION (gif|jpg|png) #REQUIRED>

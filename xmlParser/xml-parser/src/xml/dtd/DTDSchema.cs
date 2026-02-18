@@ -63,5 +63,13 @@ namespace xml_parser.src.xml
         {
             return this.buildInEntities.Find((entity) => entity.Name == name);
         }
+
+        public void Combine(DTDSchema other)
+        {
+            this.attributeLists.AddRange(other.attributeLists);
+            this.elements.AddRange(other.elements);
+            this.entities.AddRange(other.entities);
+            this.notations.AddRange(other.notations);
+        }
     }
 }

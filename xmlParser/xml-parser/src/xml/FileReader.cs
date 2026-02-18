@@ -46,9 +46,16 @@ namespace XmlParser.src.xml
 
         public string Read(string regex)
         {
-            var reg = new Regex(regex);
-            Match match = ReadFirstMatch(reg);
-            return Read(match.Length);
+            Match match = ReadFirstMatch(regex);
+            string leftOver = this.text.Substring(index);
+            if (leftOver.StartsWith(match.Value))
+                return Read(match.Length);
+            else
+            {
+                int indexFound = match.Index;
+                int toReadAmount = this.index - indexFound;
+                return Read(toReadAmount);
+            }
         }
 
         public string Peak(int amount = 1)
@@ -68,10 +75,16 @@ namespace XmlParser.src.xml
 
         public bool SkipRegex(string regex)
         {
-            var reg = new Regex(regex);
-            Match match = ReadFirstMatch(reg);
-            int toSkip = match.Length;
-            return Skip(toSkip);
+            Match match = ReadFirstMatch(regex);
+            string leftOver = this.text.Substring(index);
+            if (leftOver.StartsWith(match.Value))
+                return Skip(match.Length);
+            else
+            {
+                int indexFound = match.Index;
+                int toReadAmount = this.index - indexFound;
+                return Skip(toReadAmount);
+            }
         }
 
         public bool Back(int amount = 1)
@@ -87,11 +100,12 @@ namespace XmlParser.src.xml
             return this.index >= this.text.Length - 1;
         }
 
-        private Match ReadFirstMatch(Regex regex)
+        private Match ReadFirstMatch(string regex)
         {
             // We only need to check the part of the file data that hasn't been read yet.
             string toCheck = text.Substring(index);
-            MatchCollection matches = regex.Matches(toCheck);
+            Console.WriteLine();
+            MatchCollection matches = Regex.Matches(toCheck, regex);
             if (matches.Count == 0)
                 return null;
             Match match = matches[0];

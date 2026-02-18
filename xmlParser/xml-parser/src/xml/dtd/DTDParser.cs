@@ -19,6 +19,7 @@ namespace xml_parser.src.xml.dtd
 
     internal class DTDParser
     {
+        private string filepath;
         private string DTDContents;
         private bool isInternal = false;
         private DTDSchema schema;
@@ -27,8 +28,7 @@ namespace xml_parser.src.xml.dtd
 
         public DTDParser(string filepath)
         {
-            if (!filepath.EndsWith(".dtd"))
-                throw new DTDFileException(filepath);
+            this.filepath = filepath;
             DTDContents = File.ReadAllText(filepath);
             schema = new DTDSchema();
             Parse();
@@ -36,14 +36,7 @@ namespace xml_parser.src.xml.dtd
 
         public DTDParser(Uri external)
         {
-            try
-            {
-                this.DTDContents = Task.Run(() => Constants.httpClient.GetStringAsync(external)).Result
-            } catch(HttpRequestException e)
-            {
-                Console.WriteLine("\nEncountered an error.");
-                Console.WriteLine($"Message: {e.Message}");
-            }
+            this.DTDContents = Task.Run(() => Constants.httpClient.GetStringAsync(external)).Result;
             schema = new DTDSchema();
             Parse();
         }
@@ -63,28 +56,21 @@ namespace xml_parser.src.xml.dtd
             Parse();
         }
 
-        private Exception Parse()
+        public Exception Parse()
         {
             // ignore: "<!--"
             try
             {
                 var reader = new FileReader(DTDContents);
-                string fileNoComments = "";
-                // first itteration, remove all comments.
-                while (!reader.EndOfFile())
-                {
-                    string line = ReadElement(reader);
-                    if (Constants.RegexMatch(line, Constants.comment))
-                        continue;
-                    fileNoComments += line;
-                }
-                reader = new FileReader(fileNoComments);
+                reader = new FileReader(ParseParameterEntities(reader));
 
                 // second itteration parse the other items.
                 while (!reader.EndOfFile())
                 {
                     string line = ReadElement(reader);
-                    switch(line)
+                    if (Constants.RegexMatch(line, Constants.comment))
+                        continue;
+                    switch (line)
                     {
                         case var o when Constants.RegexMatch(o, Constants.conditionalSect) && !isInternal:
                             ParseConditional(line);
@@ -107,10 +93,43 @@ namespace xml_parser.src.xml.dtd
             catch (Exception e) { return e; }
             return null;
         }
+        
+        private string ParseParameterEntities(FileReader reader)
+        {
+            string processedFileContents = "";
+            while (!reader.EndOfFile())
+            {
+                string line = ReadParameterEntity(reader);
+                if (Constants.RegexMatch(line, Constants.comment))
+                    continue;
+                switch (line)
+                {
+                    case var o when Constants.RegexMatch(line, Constants.peDecl):
+                        this.schema.addEntity(this.ParseEntity(line));
+                        break;
+                    case var o when Constants.RegexMatch(line, Constants.peReference):
+                        line = line.Replace("%", "").Replace(";", "");
+                        string result = schema.getEntity(line, true).Value;
+                        var readerNested = new FileReader(result);
+                        ParseParameterEntities(readerNested);
+                        readerNested.Dispose();
+                        break;
+                    default:
+                        processedFileContents += line;
+                        break;
+                }
+            }
+            return processedFileContents;
+        }
 
         private string ReadElement(FileReader reader)
         {
             return reader.Read($"({Constants.markupdecl}){(!isInternal ? $"|({Constants.conditionalSect})" : "")}");
+        }
+
+        private string ReadParameterEntity(FileReader reader)
+        {
+            return reader.Read($@"({Constants.peReference})|({Constants.peDecl})");
         }
 
         private string ReplaceCharReferences(string text, MatchCollection matches)
@@ -189,9 +208,12 @@ namespace xml_parser.src.xml.dtd
             matches = regex.Matches(text);
             text = ReplaceEntityReferences(text, matches);
 
-            regex = new Regex(Constants.peReference);
-            matches = regex.Matches(text);
-            text = ReplacePEReferences(text, matches);
+            if (!isInternal) 
+            {
+                regex = new Regex(Constants.peReference);
+                matches = regex.Matches(text);
+                text = ReplacePEReferences(text, matches);
+            }
 
             return text;
         }
@@ -204,16 +226,19 @@ namespace xml_parser.src.xml.dtd
             reader.Skip(openingBrackets.Length);
             if (spaceCharacters.Contains(reader.Peak().First()))
                 reader.SkipRegex(Constants.space);
-
             if (Constants.RegexMatch(item, Constants.ignoreSect))
                 return;
             const string include = "INCLUDE";
             const string closingBrackets = "]]>";
-            
+            reader.Skip(include.Length);
+            string toParse = reader.Read(closingBrackets);
+            var parser = new DTDParser(new FileReader(toParse));
+            schema.Combine(parser.Schema);
         }
 
         private DTDEntity ParseEntity(string item)
         {
+            char[] spaceCharacters = new char[] { ' ', '\t', '\r', '\n' };
             bool global = Constants.RegexMatch(item, Constants.peDecl);
             const string entityHeader = "<!ENTITY";
             var reader = new FileReader(item);
@@ -231,6 +256,33 @@ namespace xml_parser.src.xml.dtd
                 value = reader.Read(Constants.entityDef);
             else
                 value = reader.Read(Constants.peDef);
+            if (Constants.RegexMatch(value, Constants.externalId))
+            {
+                switch (value)
+                {
+                    case var o when o.StartsWith("SYSTEM"):
+                        o = o.Remove(0, "SYSTEM".Length);
+                        o = o.TrimStart(spaceCharacters);
+                        if (Constants.RegexMatch(o, Constants.url))
+                            o = Constants.RegexReplace(o, "", Constants.domain);
+                        string path = Constants.RegexExtract(filepath, Constants.filePath);
+                        var parser = new DTDParser(path + o);
+                        schema.Combine(parser.Schema);
+                        parser = null;
+                        break;
+                    case var o when o.StartsWith("PUBLIC"):
+                        o = o.Remove(0, "PUBLIC".Length);
+                        o = o.TrimStart(spaceCharacters);
+                        string metaData = Constants.RegexExtract(o, Constants.pubidLiteral);
+                        o = Constants.RegexReplace(o, "", Constants.pubidLiteral);
+                        o = o.TrimStart(spaceCharacters);
+                        var uri = new Uri(o);
+                        var parserPublic = new DTDParser(uri);
+                        schema.Combine(parserPublic.Schema);
+                        parserPublic = null;
+                        break;
+                }
+            }
             value = ReplaceReferences(value);
 
             reader.Dispose();
