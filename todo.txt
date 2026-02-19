@@ -1,0 +1,5 @@
+requirements:
+window with toolbar that allows for opening files and other things.
+xml object class.
+xml object has name and properties.
+way to parse c# class into an xml object, and other way around.
