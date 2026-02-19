@@ -27,7 +27,9 @@ namespace XmlParser.src
         // file regex
         public static readonly string filePath = "(^(?:[\\w]:(\\\\|\\/))(?:(?:\\.{1,2}(\\/|\\\\)))?(?:\\w+(\\/|\\\\))*)";
         public static readonly string file = $"(^(?:[\\w]:(\\\\|\\/))(?:(?:\\.{{1,2}}(\\/|\\\\)))?(?:\\w+(\\/|\\\\))*([^{Path.GetInvalidFileNameChars()}]))";
-        
+
+        // Indexing
+        public static readonly string index = @"(\[[0-9]{,2}])";
 
         // Character Range
         public static readonly string chararacter = "(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD])";
@@ -203,6 +205,25 @@ namespace XmlParser.src
             var reg = new Regex(regex);
             Match match = reg.Match(value);
             return match.Value;
+        }
+
+        public static string RegexRemove(string value, string regex, int count = 1)
+        {
+            var newVal = value;
+            var matches = Regex.Matches(value, regex);
+            for(int i = 0; i < count; i++)
+            {
+                var match = matches[i];
+                newVal = value.Remove(match.Index, match.Length);
+            }
+            return newVal;
+        }
+        public static int CountChar(string value, char needle)
+        {
+            int count = 0;
+            foreach (char c in value)
+                if (c == needle) count++;
+            return count;
         }
     }
 }

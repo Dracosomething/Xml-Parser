@@ -91,8 +91,6 @@ namespace xml_parser.src.xml.dtd
             return res;
         }
 
-
-
         public Pair<DTDSequence, Pair<string, Instruction>> this[int i]
         {
             get

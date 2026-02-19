@@ -15,7 +15,7 @@ namespace XmlParser.src.xml
 
         public FileReader(FileInfo info)
         {
-            text = File.ReadAllText(info.FullName);
+            this.text = File.ReadAllText(info.FullName);
         }
 
         public FileReader(string fileContents)

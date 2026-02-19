@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using xml_parser.src.EBNF;
 using xml_parser.src.xml.dtd;
 
 namespace XmlParser
