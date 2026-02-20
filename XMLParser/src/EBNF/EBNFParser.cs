@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using xml_parser.src.xml;
+﻿using System.Collections;
 using XmlParser.src;
-using XmlParser.src.xml;
 using XMLParser.src.EBNF;
 
 /*  ==============How the stream for an EBNF expression should look like==============
@@ -135,9 +128,9 @@ namespace xml_parser.src.EBNF
             
         }
 
-        private EBNFCollection Parse(string expresion)
+        private EBNFTokens Parse(string expresion)
         {
-            EBNFCollection expressions = new EBNFCollection();
+            EBNFTokens expressions = new EBNFTokens();
             for (int i = 0; i < expresion.Length; i++)
             {
                 char c = expresion[i];
@@ -149,11 +142,119 @@ namespace xml_parser.src.EBNF
                     case var _ when c == '(':
                         expressions.Add(ReadGroup(expresion, ref i));
                         break;
+                    case var _ when c == '[':
+                        expressions.Add(ReadCollection(expresion, ref i));
+                        break;
                     case var _ when c == '#' && expresion[i + 1] == 'x':
                         expressions.Add(ReadHexadecimal(expresion, ref i));
                         break;
 
                 }
+
+            }
+        }
+
+        private EBNFExpression ReadCollection(string expression, ref int index)
+        {
+            EBNFCollection collection = new EBNFCollection();
+            string result = "";
+            if (expression[index + 1] == '^')
+            {
+                collection.Not = true;
+                index++;
+            }
+            char c;
+            bool isFirst = true;
+            bool isLast = false;
+            bool isHex = false;
+            if (expression[index + 1] == '#' && expression[index + 2] == 'x')
+            {
+                isHex = true;
+            }
+            if (isHex)
+                ReadCollectionHex(expression, ref index, ref collection, ref result);
+            else
+                ReadCollectionNormal(expression, ref index, ref collection, ref result);
+            
+            return new EBNFExpression
+            {
+                Rule = EBNFToken.COLLECTION,
+                Token = $"[{(collection.Not ? "^" : "")}" + result + "]",
+                Type = typeof(EBNFCollection),
+                Data = collection
+            };
+        }
+
+        private void ReadCollectionHex(string expression, ref int index, ref EBNFCollection collection, ref string result)
+        {
+            bool isLast = false;
+            while (true)
+            {
+                if (isLast)
+                    break;
+                if (expression[index + 1] == ']')
+                    isLast = true;
+                int num;
+                ReadHexadecimal(expression, ref index).GetData(out num);
+                char next = expression[index + 1];
+                result += num;
+                if (next == '-')
+                {
+                    index++;
+                    result += '-';
+                    int num2;
+                    ReadHexadecimal(expression, ref index).GetData(out num2);
+                    result += num2;
+                    var range = new XMLParser.src.EBNF.Range
+                    {
+                        Start = num,
+                        End = num2
+                    };
+                    collection.Add(range);
+                    continue;
+                }
+                collection.Add(num);
+            }
+        }
+
+        private void ReadCollectionNormal(string expression, ref int index, ref EBNFCollection collection, ref string result)
+        {
+            bool isFirst = true;
+            bool isLast = false;
+            char c;
+            while ((c = expression[++index]) != ']')
+            {
+                if (expression[index + 1] == ']')
+                    isLast = true;
+                if (c == '\\')
+                {
+                    if (isFirst)
+                        isFirst = false;
+                    char next = expression[++index];
+                    if (next == ']')
+                    {
+                        result += next;
+                        continue;
+                    }
+                    else
+                        index--;
+                }
+                result += c;
+                if (!isFirst && !isLast && c == '-')
+                {
+                    char next = expression[++index];
+                    char previous = expression[index - 2];
+                    var range = new XMLParser.src.EBNF.Range
+                    {
+                        Start = next,
+                        End = previous
+                    };
+                    collection.Add(range);
+                    if (isFirst)
+                        isFirst = false;
+                    continue;
+                }
+                collection.Add(c);
             }
         }
 
@@ -197,7 +298,7 @@ namespace xml_parser.src.EBNF
             {
                 Rule = EBNFToken.GROUP,
                 Token = '(' + result,
-                Type = typeof(EBNFCollection),
+                Type = typeof(EBNFTokens),
                 Data = Parse(result)
             };
         }
