@@ -31,6 +31,9 @@ namespace XmlParser.src
         // Indexing
         public static readonly string index = @"(\[[0-9]{,2}])";
 
+        // EBNF tokens
+        public static readonly string range = @"\[^?(([a-zA-Z0-9]|(#x[a-fA-F0-9]{1,5}))\-([a-zA-Z0-9]|(#x[a-fA-F0-9]{1,5})))+]";
+
         // Character Range
         public static readonly string chararacter = "(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD])";
 
@@ -224,6 +227,20 @@ namespace XmlParser.src
             foreach (char c in value)
                 if (c == needle) count++;
             return count;
+        }
+
+        public static int IntFromHex(string hexadecimal)
+        {
+            int result = 0;
+            for (int i = 0; i < hexadecimal.Length; i++)
+            {
+                int byte_ = hexadecimal[i];
+                if (byte_ >= '0' && byte_ <= '9') byte_ -= '0';
+                else if (byte_ >= 'a' && byte_ <= 'f') byte_ -= 'a' + 10;
+                else if (byte_ >= 'A' && byte_ <= 'F') byte_ -= 'A' + 10;
+                result = (result << 4) | (byte_ & 0xF);
+            }
+            return result;
         }
     }
 }
