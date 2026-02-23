@@ -61,5 +61,21 @@ namespace XMLParser.src.EBNF
             value = default!;
             return false;
         }
+
+        public bool Check(char c)
+        {
+            if (characters.Count != 0 && characters.ContainsValue(c))
+                return true;
+            if (ranges.Count != 0)
+            {
+                foreach(var pair in ranges)
+                {
+                    var range = pair.Value;
+                    if (range.IsBetween(c))
+                        return true;
+                }
+            }
+            return false;
+        }
     }
 }

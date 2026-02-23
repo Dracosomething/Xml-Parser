@@ -7,8 +7,8 @@
       "RelativeMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|solutionrelative:xmlparser\\src\\ebnf\\ebnfparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|c:\\users\\alias\\documents\\stage\\xmlparser\\xmlparser\\src\\ebnf\\ebnfcollection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|solutionrelative:xmlparser\\src\\ebnf\\ebnfcollection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|c:\\users\\alias\\documents\\stage\\xmlparser\\xmlparser\\src\\ebnf\\ebnftokens.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|solutionrelative:xmlparser\\src\\ebnf\\ebnftokens.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|c:\\users\\alias\\documents\\stage\\xmlparser\\xmlparser\\src\\constants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -17,10 +17,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|c:\\users\\alias\\documents\\stage\\xmlparser\\xmlparser\\src\\xml\\xmlprocessinstructions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|solutionrelative:xmlparser\\src\\xml\\xmlprocessinstructions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|c:\\users\\alias\\documents\\stage\\xmlparser\\xmlparser\\src\\ebnf\\ebnfexpression.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D1A891F-EBF1-9B8D-AFFB-59A5F18E6D3C}|XMLParser\\XMLParser.csproj|solutionrelative:xmlparser\\src\\ebnf\\ebnfexpression.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,19 +26,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "EBNFExpression.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFExpression.cs",
-              "RelativeDocumentMoniker": "XMLParser\\src\\EBNF\\EBNFExpression.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFExpression.cs",
-              "RelativeToolTip": "XMLParser\\src\\EBNF\\EBNFExpression.cs",
+              "DocumentIndex": 1,
+              "Title": "EBNFTokens.cs",
+              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFTokens.cs",
+              "RelativeDocumentMoniker": "XMLParser\\src\\EBNF\\EBNFTokens.cs",
+              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFTokens.cs",
+              "RelativeToolTip": "XMLParser\\src\\EBNF\\EBNFTokens.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-20T10:45:03.245Z",
+              "WhenOpened": "2026-02-20T12:36:06.495Z",
               "EditorCaption": ""
             },
             {
@@ -55,8 +51,7 @@
               "RelativeToolTip": "XMLParser\\src\\xml\\XMLProcessInstructions.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-20T10:44:38.003Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-20T10:44:38.003Z"
             },
             {
               "$type": "Document",
@@ -73,26 +68,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "EBNFCollection.cs",
-              "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFCollection.cs",
-              "RelativeDocumentMoniker": "XMLParser\\src\\EBNF\\EBNFCollection.cs",
-              "ToolTip": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFCollection.cs",
-              "RelativeToolTip": "XMLParser\\src\\EBNF\\EBNFCollection.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-20T10:22:26.562Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "EBNFParser.cs",
               "DocumentMoniker": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFParser.cs",
               "RelativeDocumentMoniker": "XMLParser\\src\\EBNF\\EBNFParser.cs",
               "ToolTip": "C:\\Users\\alias\\Documents\\stage\\XMLParser\\XMLParser\\src\\EBNF\\EBNFParser.cs",
               "RelativeToolTip": "XMLParser\\src\\EBNF\\EBNFParser.cs",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAAJgAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAH8AAAAAAAAAAAAowJoAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-19T12:36:17.162Z",
               "EditorCaption": ""

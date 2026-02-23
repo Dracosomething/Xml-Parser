@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq.Expressions;
 using XmlParser.src;
 using XMLParser.src.EBNF;
 
@@ -51,6 +52,11 @@ using XMLParser.src.EBNF;
  *      if character is space
  *          start new expression
  *      end if
+ *      else
+ *          read untill next space
+ *          get referenced expression
+ *          parse referenced expression
+ *      end if
  *  end while
  */
 
@@ -59,18 +65,9 @@ namespace xml_parser.src.EBNF
     enum EBNFToken
     {
         HEXADECIMAL,
-        RANGE,
         COLLECTION,
-        NOT_RANGE,
-        NOT_COLLECTION,
         STRING,
         GROUP,
-        OR,
-        OPTIONAL,
-        FOLLOWED,
-        NOT,
-        PLUS,
-        STAR,
         REFERENCE
     }
 
@@ -118,40 +115,86 @@ namespace xml_parser.src.EBNF
             return line == null ? "" : line;
         }
 
-        public bool Check(string text, int index)
+        public bool Validate(string text, int index)
         {
             var decleration = GetExpression(index);
             var expression = decleration.Split("::=").Last();
             //var tokens = Tokenize(expression);
             bool result = false;
             int indexText = 0;
-            
+            EBNFTokens tokens = Parse(expression);
+
         }
 
         private EBNFTokens Parse(string expresion)
         {
-            EBNFTokens expressions = new EBNFTokens();
+            var expressions = new EBNFTokens();
+            int expressionsIndex = -1;
             for (int i = 0; i < expresion.Length; i++)
             {
                 char c = expresion[i];
+                if (c == ' ')
+                    continue;
                 switch (c)
                 {
                     case var _ when c == '"' || c == '\'':
                         expressions.Add(ReadString(expresion, c, ref i));
+                        expressionsIndex++;
                         break;
                     case var _ when c == '(':
                         expressions.Add(ReadGroup(expresion, ref i));
+                        expressionsIndex++;
                         break;
                     case var _ when c == '[':
                         expressions.Add(ReadCollection(expresion, ref i));
+                        expressionsIndex++;
                         break;
                     case var _ when c == '#' && expresion[i + 1] == 'x':
+                        i++;
                         expressions.Add(ReadHexadecimal(expresion, ref i));
+                        expressionsIndex++;
                         break;
-
+                    case var _ when c == '|':
+                        expressions.SetRule(EBNFUnificationRule.OR, expressionsIndex);
+                        break;
+                    case var _ when c == '-':
+                        expressions.SetRule(EBNFUnificationRule.NOT, expressionsIndex);
+                        break;
+                    case var _ when c == '+':
+                        expressions.SetQuantifier(EBNFQuantifier.MULTIPLE, expressionsIndex);
+                        break;
+                    case var _ when c == '*':
+                        expressions.SetQuantifier(EBNFQuantifier.OPT_MULTIPLE, expressionsIndex);
+                        break;
+                    case var _ when c == '?':
+                        expressions.SetQuantifier(EBNFQuantifier.OPTIONAL, expressionsIndex);
+                        break;
+                    default:
+                        expressions.Add(ReadReference(expresion, ref i));
+                        break;
                 }
-
             }
+            return expressions;
+        }
+
+        private EBNFExpression ReadReference(string expression, ref int index)
+        {
+            string result = "";
+            char c;
+            while ((c = expression[++index]) == ' ')
+            {
+                result += c;
+            }
+            var decleration = GetExpression(result);
+            var expressionFound = decleration.Split("::=").Last();
+            var tokens = Parse(expressionFound);
+            return new EBNFExpression
+            {
+                Rule = EBNFToken.REFERENCE,
+                Token = result,
+                Type = typeof(EBNFTokens),
+                Data = tokens
+            };
         }
 
         private EBNFExpression ReadCollection(string expression, ref int index)
@@ -262,7 +305,6 @@ namespace xml_parser.src.EBNF
         {
             string result = "";
             char c;
-            index++;
             int length = 0;
             while ((c = expression[++index]) != ' ' || c != '-' || c != '#')
             {
@@ -293,13 +335,13 @@ namespace xml_parser.src.EBNF
                 if (nestingCount == 0 && c == ')')
                     break;
             };
-
+            EBNFTokens tokens = Parse(result);
             return new EBNFExpression
             {
                 Rule = EBNFToken.GROUP,
                 Token = '(' + result,
                 Type = typeof(EBNFTokens),
-                Data = Parse(result)
+                Data = tokens
             };
         }
 

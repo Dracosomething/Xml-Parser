@@ -11,23 +11,9 @@ namespace xml_parser.src.xml
     /// </summary>
     internal struct Pair<K, V>
     {
-        private K key;
-        private V value;
-    
-        public K Key
-        {
-            get { return key; }
-        }
+        public K Key { get; init; }
 
-        public V Value
-        {
-            get { return value; }
-        }
-
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
+        public V Value { get; init; }
 
         public override string ToString()
         {

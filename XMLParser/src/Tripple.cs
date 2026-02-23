@@ -8,30 +8,10 @@ namespace xml_parser.src.xml
 {
     internal class Tripple<A, B, C>
     {
-        private A first;
-        private B second;
-        private C third;
+        public A First { get; init; }
 
-        public A First
-        {
-            get { return first; }
-        }
-
-        public B Second
-        {
-            get { return second; }
-        }
-        public C Third
-        {
-            get { return third; }
-        }
-
-        public Tripple(A first, B second, C third )
-        {
-            this.first = first;
-            this.second = second;
-            this.third = third;
-        }
+        public B Second { get; init; }
+        public C Third { get; init; }
 
         public override string ToString()
         {
