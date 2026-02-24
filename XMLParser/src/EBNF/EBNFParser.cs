@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Linq.Expressions;
 using XmlParser.src;
-using XMLParser.src.EBNF;
+using XmlParser.src.EBNF;
+using XmlParser.src.xml;
 
 /*  ==============How the stream for an EBNF expression should look like==============
  *  
@@ -10,6 +11,10 @@ using XMLParser.src.EBNF;
  *      get current character
  *      if quotation
  *          read characters untill closeing quotation
+ *          if character is \\
+ *              check if next character is the closing notation
+ *              add to result
+ *          end if
  *      end if
  *      if opening brackets
  *          create sepperate data block
@@ -60,7 +65,7 @@ using XMLParser.src.EBNF;
  *  end while
  */
 
-namespace xml_parser.src.EBNF
+namespace XmlParser.src.EBNF
 {
     enum EBNFToken
     {
@@ -68,7 +73,8 @@ namespace xml_parser.src.EBNF
         COLLECTION,
         STRING,
         GROUP,
-        REFERENCE
+        REFERENCE,
+        POINTER
     }
 
     internal class EBNFParser
@@ -93,6 +99,7 @@ namespace xml_parser.src.EBNF
          * [ vc: ... ] validity constraint; this identifies by name a constraint on valid documents associated with a production.
          */
         private string path;
+        private Dictionary<string, EBNFTokens> parsed = new Dictionary<string, EBNFTokens>();
 
         public EBNFParser(string path)
         {
@@ -111,22 +118,40 @@ namespace xml_parser.src.EBNF
         public string GetExpression(string name)
         {
             var line = File.ReadLines(path)
-                .FirstOrDefault(line => Constants.RegexRemove(line, Constants.index).TrimStart().StartsWith(name));
+                .FirstOrDefault(line =>
+                {
+                    var tmp = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (tmp.Length == 0)
+                        return false;
+                    return tmp[1] == name;
+                });
             return line == null ? "" : line;
         }
 
         public bool Validate(string text, int index)
         {
             var decleration = GetExpression(index);
-            var expression = decleration.Split("::=").Last();
-            //var tokens = Tokenize(expression);
-            bool result = false;
-            int indexText = 0;
-            EBNFTokens tokens = Parse(expression);
-
+            var tokenized = decleration.Split("::=");
+            var name = tokenized.First().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];
+            EBNFTokens tokens;
+            if (parsed.ContainsKey(name))
+                tokens = parsed[name];
+            else
+            {
+                var expression = decleration.Split("::=").Last().TrimStart(' ');
+                bool result = false;
+                int indexText = 0;
+                List<string> tmp = new List<string>();
+                tokens = Parse(expression, ref tmp);
+                parsed[name] = tokens;
+            }
+            int tmpLen = 0;
+            tokens.SetReferenced(parsed);
+            var tmpDic = new Dictionary<Pair<int, int>, Pair<int, string>>();
+            return tokens.Validate(text, ref tmpLen, ref tmpDic);
         }
 
-        private EBNFTokens Parse(string expresion)
+        private EBNFTokens Parse(string expresion, ref List<string> stack)
         {
             var expressions = new EBNFTokens();
             int expressionsIndex = -1;
@@ -142,7 +167,7 @@ namespace xml_parser.src.EBNF
                         expressionsIndex++;
                         break;
                     case var _ when c == '(':
-                        expressions.Add(ReadGroup(expresion, ref i));
+                        expressions.Add(ReadGroup(expresion, ref stack, ref i));
                         expressionsIndex++;
                         break;
                     case var _ when c == '[':
@@ -170,24 +195,52 @@ namespace xml_parser.src.EBNF
                         expressions.SetQuantifier(EBNFQuantifier.OPTIONAL, expressionsIndex);
                         break;
                     default:
-                        expressions.Add(ReadReference(expresion, ref i));
+                        expressions.Add(ReadReference(expresion, ref stack, ref i));
+                        expressionsIndex++;
                         break;
                 }
             }
             return expressions;
         }
 
-        private EBNFExpression ReadReference(string expression, ref int index)
+        private EBNFExpression ReadReference(string expression, ref List<string> stack, ref int index)
         {
             string result = "";
             char c;
-            while ((c = expression[++index]) == ' ')
+            while ((c = expression[index++]) != ' ' && c != '*' && c != '?' && c != '+')
             {
                 result += c;
+                if (index == expression.Length)
+                {
+                    index++;
+                    break;
+                }
             }
-            var decleration = GetExpression(result);
-            var expressionFound = decleration.Split("::=").Last();
-            var tokens = Parse(expressionFound);
+            // go back one since we still need the next characters
+            index -= 2;
+            if(stack.Contains(result))
+            {
+                return new EBNFExpression
+                {
+                    Rule = EBNFToken.POINTER,
+                    Token = result,
+                    Type = typeof(string),
+                    Data = result
+                };
+            }
+            EBNFTokens tokens;
+            // check if we have already parsed this expression before so that we dont parse anything twice.
+            if (parsed.ContainsKey(result))
+                tokens = parsed[result];
+            else
+            {
+                var decleration = GetExpression(result);
+                var expressionFound = decleration.Split("::=").Last().TrimStart(' ');
+                stack.Add(result);
+                tokens = Parse(expressionFound, ref stack);
+                stack.Remove(result);
+                parsed[result] = tokens;
+            }
             return new EBNFExpression
             {
                 Rule = EBNFToken.REFERENCE,
@@ -230,25 +283,24 @@ namespace xml_parser.src.EBNF
 
         private void ReadCollectionHex(string expression, ref int index, ref EBNFCollection collection, ref string result)
         {
-            bool isLast = false;
             while (true)
             {
-                if (isLast)
+                if (expression[index] == ']')
                     break;
-                if (expression[index + 1] == ']')
-                    isLast = true;
+                // skip the first 2 characters since they are allways going to be #x
+                index += 2;
                 int num;
                 ReadHexadecimal(expression, ref index).GetData(out num);
-                char next = expression[index + 1];
+                char next = expression[index];
                 result += num;
                 if (next == '-')
                 {
-                    index++;
+                    index += 2;
                     result += '-';
                     int num2;
                     ReadHexadecimal(expression, ref index).GetData(out num2);
                     result += num2;
-                    var range = new XMLParser.src.EBNF.Range
+                    var range = new Range
                     {
                         Start = num,
                         End = num2
@@ -257,6 +309,8 @@ namespace xml_parser.src.EBNF
                     continue;
                 }
                 collection.Add(num);
+                if (index + 1 >= expression.Length)
+                    break;
             }
         }
 
@@ -265,7 +319,7 @@ namespace xml_parser.src.EBNF
             bool isFirst = true;
             bool isLast = false;
             char c;
-            while ((c = expression[++index]) != ']')
+            while (index + 1 < expression.Length && (c = expression[++index]) != ']')
             {
                 if (expression[index + 1] == ']')
                     isLast = true;
@@ -287,7 +341,7 @@ namespace xml_parser.src.EBNF
                 {
                     char next = expression[++index];
                     char previous = expression[index - 2];
-                    var range = new XMLParser.src.EBNF.Range
+                    var range = new Range
                     {
                         Start = next,
                         End = previous
@@ -306,7 +360,7 @@ namespace xml_parser.src.EBNF
             string result = "";
             char c;
             int length = 0;
-            while ((c = expression[++index]) != ' ' || c != '-' || c != '#')
+            while (index + 1 < expression.Length && (c = expression[++index]) != ' ' && c != '-' && c != '#' && c != ']')
             {
                 result += c;
                 length++;
@@ -321,25 +375,30 @@ namespace xml_parser.src.EBNF
             };
         }
 
-        private EBNFExpression ReadGroup(string expression, ref int index)
+        private EBNFExpression ReadGroup(string expression, ref List<string> stack, ref int index)
         {
             string result = "";
             char c;
-            int nestingCount = 0;
+            int nestingCount = 1;
             while (true) 
             {
+                if (index + 1 >= expression.Length)
+                    break;
                 c = expression[++index];
-                result += c;
                 if (c == '(')
                     nestingCount++;
+                if (c == ')')
+                    nestingCount--;
                 if (nestingCount == 0 && c == ')')
                     break;
-            };
-            EBNFTokens tokens = Parse(result);
+                result += c;
+            }
+            ;
+            EBNFTokens tokens = Parse(result, ref stack);
             return new EBNFExpression
             {
                 Rule = EBNFToken.GROUP,
-                Token = '(' + result,
+                Token = '(' + result + ')',
                 Type = typeof(EBNFTokens),
                 Data = tokens
             };
@@ -349,7 +408,7 @@ namespace xml_parser.src.EBNF
         {
             string result = "";
             char c;
-            while ((c = expression[++index]) != end) 
+            while (index + 1 < expression.Length && (c = expression[++index]) != end) 
             { 
                 if (c == '\\')
                 {

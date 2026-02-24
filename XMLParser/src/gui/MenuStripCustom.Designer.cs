@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using XmlParser.src;
+using XmlParser.src.gui.render;
 
-namespace XmlParser
+namespace XmlParser.src.gui
 {
     partial class MenuStripCustom
     {

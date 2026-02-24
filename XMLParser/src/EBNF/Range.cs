@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace XMLParser.src.EBNF
+namespace XmlParser.src.EBNF
 {
     internal struct Range
     {
@@ -11,7 +11,7 @@ namespace XMLParser.src.EBNF
 
         public bool IsBetween(int num)
         {
-            return num > Start && num < End;
+            return num >= Start && num <= End;
         }
     }
 }

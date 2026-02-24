@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using xml_parser.src.xml.dtd;
+using XmlParser.src.xml.dtd;
 
-namespace XmlParser
+namespace XmlParser.src.gui
 {
     public partial class MainWindow : Form
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XmlParser.src;
 
-namespace xml_parser.src.xml.dtd
+namespace XmlParser.src.xml.dtd
 {
     internal class DTDAttribute
     {
@@ -34,8 +35,16 @@ namespace xml_parser.src.xml.dtd
             if (dataType == DTDDataType.ENUMERATION || dataType == DTDDataType.NOTATION)
                 throw new ArgumentException("Param can not be of an enumeration type", "dataType");
             this.name = name;
-            this.datatype = new Pair<DTDDataType, List<string>>(dataType, null);
-            this.attributeDefault = new Pair<DTDDeclarationType, string>(declarationType, value);
+            this.datatype = new Pair<DTDDataType, List<string>>
+            {
+                Key = dataType,
+                Value = null
+            };
+            this.attributeDefault = new Pair<DTDDeclarationType, string>
+            {
+                Key = declarationType,
+                Value = value
+            };
         }
 
         public DTDAttribute(string name, DTDDataType dataType, List<string> enumeration, DTDDeclarationType declarationType, string value = null)
@@ -45,8 +54,16 @@ namespace xml_parser.src.xml.dtd
             if (dataType != DTDDataType.ENUMERATION || dataType != DTDDataType.NOTATION)
                 throw new ArgumentException("Param must be of an enumeration type", "dataType");
             this.name = name;
-            this.datatype = new Pair<DTDDataType, List<string>>(dataType, enumeration);
-            this.attributeDefault = new Pair<DTDDeclarationType, string>(declarationType, value);
+            this.datatype = new Pair<DTDDataType, List<string>>
+            {
+                Key = dataType,
+                Value = enumeration
+            };
+            this.attributeDefault = new Pair<DTDDeclarationType, string>
+            {
+                Key = declarationType,
+                Value = value
+            };
         }
     }
 }

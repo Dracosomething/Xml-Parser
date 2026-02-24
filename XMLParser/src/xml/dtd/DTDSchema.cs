@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using xml_parser.src.xml.dtd;
+using XmlParser.src.xml.dtd;
 
-namespace xml_parser.src.xml
+namespace XmlParser.src.xml
 {
     internal class DTDSchema
     {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using XmlParser.src;
 
-namespace XmlParser
+namespace XmlParser.src.gui.render
 {
     internal class MenuStripCustomColors : ProfessionalColorTable
     {

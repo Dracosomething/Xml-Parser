@@ -6,7 +6,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using xml_parser.src.xml;
+using XmlParser.src.gui;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace XmlParser.src
@@ -237,8 +237,8 @@ namespace XmlParser.src
             {
                 int byte_ = hexadecimal[i];
                 if (byte_ >= '0' && byte_ <= '9') byte_ -= '0';
-                else if (byte_ >= 'a' && byte_ <= 'f') byte_ -= 'a' + 10;
-                else if (byte_ >= 'A' && byte_ <= 'F') byte_ -= 'A' + 10;
+                else if (byte_ >= 'a' && byte_ <= 'f') byte_ =  byte_ - 'a' + 10;
+                else if (byte_ >= 'A' && byte_ <= 'F') byte_ = byte_ - 'A' + 10;
                 result = (result << 4) | (byte_ & 0xF);
             }
             return result;

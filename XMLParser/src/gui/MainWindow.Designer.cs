@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System;
 using XmlParser.src;
 
-namespace XmlParser
+namespace XmlParser.src.gui
 {
     partial class MainWindow
     {

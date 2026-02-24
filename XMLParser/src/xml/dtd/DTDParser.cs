@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using XmlParser.src;
 using XmlParser.src.xml;
 
-namespace xml_parser.src.xml.dtd
+namespace XmlParser.src.xml.dtd
 {
     public class DTDFileException : Exception
     {

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq.Expressions;
-using System.Text;
-using xml_parser.src.EBNF;
-using xml_parser.src.xml;
+﻿using XmlParser.src.xml;
 
-namespace XMLParser.src.EBNF
+namespace XmlParser.src.EBNF
 {
     /*  ======================Validate function pseudo code======================
      *  input string
@@ -74,6 +68,7 @@ namespace XMLParser.src.EBNF
     {
         private Dictionary<int, Tripple<EBNFUnificationRule, EBNFQuantifier, EBNFExpression>> tokens = 
             new Dictionary<int, Tripple<EBNFUnificationRule, EBNFQuantifier, EBNFExpression>>();
+        private Dictionary<string, EBNFTokens> referenced;
         private int index = 0;
 
         public EBNFExpression this[int i]
@@ -161,25 +156,42 @@ namespace XMLParser.src.EBNF
             return res;
         }
 
-        public bool Validate(string check)
+        public void SetReferenced(Dictionary<string, EBNFTokens> value) => this.referenced = value;
+
+        public bool Validate(string check, ref int length, ref Dictionary<Pair<int, int>, Pair<int, string>> saved)
         {
             int index = 0;
             int oldIndex = index;
             bool setCurrent = true;
             bool current = false;
             List<bool> groups = new List<bool>();
-            int groupIndex = 0;
+            int groupsIndex = 0;
             for(int i = 0; i < this.index; i++)
             {
+                /*
+                 * if we encounter a token of type pointer
+                 * skip it for now, but save the index and the name and skip to where the next token is.
+                 * at the end of the function check if all other ones are correct
+                 * if they are correct, call validate on the referenced tokens at the saved indexes
+                 * 
+                 */
                 if (index >= check.Length)
                     break;
                 bool toAdd;
-                char c = check[index++];
+                char c = check[index];
                 var token = tokens[i];
                 var rule = token.First;
                 var quantifier = token.Second;
                 var expression = token.Third;
-                bool expressionResult = Check(c, check, quantifier, expression, ref index);
+                bool expressionResult;
+                if (expression.Rule == EBNFToken.POINTER)
+                {
+                    var nextToken = tokens[++i];
+                    var nextExpression = nextToken.Third;
+                    expressionResult = expression.Check(check, nextExpression, groupsIndex, ref index, ref saved);
+                } 
+                else
+                    expressionResult = Check(c, check, quantifier, expression, ref index, ref length, ref saved);
 
                 if (rule == EBNFUnificationRule.NOT)
                 {
@@ -187,7 +199,7 @@ namespace XMLParser.src.EBNF
                     var nextToken = tokens[++i];
                     var nextQuantifier = nextToken.Second;
                     var nextExpression = nextToken.Third;
-                    bool next = !Check(c, check, nextQuantifier, nextExpression, ref index);
+                    bool next = Check(c, check, nextQuantifier, nextExpression, ref index, ref length, ref saved);
                     // a - b
                     // input is abefe
                     // output is false 
@@ -204,38 +216,67 @@ namespace XMLParser.src.EBNF
                 
                 if (rule == EBNFUnificationRule.OR)
                 {
-                    groups[groupIndex++] = current;
+                    groups.Add(current);
                     current = false;
                     setCurrent = true;
+                    index = oldIndex;
+                    groupsIndex++;
+                }
+                oldIndex = index;
+            }
+            groups.Add(current);
+            var allGood = groups.Any(b => b);
+            if (allGood)
+            {
+                foreach (var pair in saved)
+                {
+                    var range = pair.Key;
+                    var data = pair.Value;
+                    //var toCheck = 
                 }
             }
-            return groups.All(b => b);
         }
 
-        private bool Check(char c, string check, EBNFQuantifier quantifier, EBNFExpression expression, ref int index)
+        private bool Check(char c, string check, EBNFQuantifier quantifier, EBNFExpression expression, ref int index, ref int length, 
+            ref Dictionary<Pair<int, int>, Pair<int, string>> saved)
         {
             bool expressionResult = false;
             switch (quantifier)
             {
                 case EBNFQuantifier.ONE:
-                    if (expression.Rule == EBNFToken.STRING)
-                        expressionResult = expression.Check(check, ref index);
-                    expressionResult = expression.Check(c);
+                    expressionResult = expression.Check(check, ref index, ref saved);
+                    length++;
                     break;
                 case EBNFQuantifier.OPTIONAL:
-                    if (expression.Rule == EBNFToken.STRING)
-                        expression.Check(check, ref index);
-                    expression.Check(c);
+                    if (expression.Check(check, ref index, ref saved)) 
+                    {
+                        length++;
+                    }
+                    expressionResult = true;
                     break;
                 case EBNFQuantifier.MULTIPLE:
-                    if (expression.Rule == EBNFToken.STRING)
-                        expressionResult = expression.Check(check, ref index);
-                    expressionResult = expression.Check(c);
-                    while (expression.Check(check[index++])) ;
+                    expressionResult = expression.Check(check, ref index, ref saved);
+                    while (true)
+                    {
+                        char newChar = check[index++];
+                        bool shouldStop = false;
+                        shouldStop = !expression.Check(check, ref index, ref saved);
+                        if (shouldStop)
+                            break;
+                        length++;
+                    }
                     break;
                 case EBNFQuantifier.OPT_MULTIPLE:
-                    index--;
-                    while (expression.Check(check[index++])) ;
+                    while (true)
+                    {
+                        char newChar = check[index++];
+                        bool shouldStop = false;
+                        shouldStop = !expression.Check(check, ref index, ref saved);
+                        if (shouldStop)
+                            break;
+                        length++;
+                    }
+                    expressionResult = true;
                     break;
             }
             return expressionResult;

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XmlParser
+namespace XmlParser.src.gui.render
 {
     internal class MenuStripCustomRenderer : ToolStripProfessionalRenderer
     {

@@ -10,9 +10,9 @@ using System.Windows.Forms;
 using XmlParser.src;
 using XmlParser.src.xml;
 
-namespace XmlParser
+namespace XmlParser.src.gui
 {
-    public partial class MenuStripCustom : MenuStrip
+    partial class MenuStripCustom : MenuStrip
     {
         private MainWindow main;
         private TextBox fileContent;

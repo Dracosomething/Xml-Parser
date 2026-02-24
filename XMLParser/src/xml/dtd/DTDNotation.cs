@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XmlParser.src.xml;
 
-namespace xml_parser.src.xml.dtd
+namespace XmlParser.src.xml.dtd
 {
     internal class DTDNotation
     {

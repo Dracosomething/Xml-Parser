@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace XMLParser.src.EBNF
+namespace XmlParser.src.EBNF
 {
     internal class EBNFCollection
     {
@@ -20,11 +20,11 @@ namespace XMLParser.src.EBNF
             }
         }
 
-        public bool Add(char value) => characters.TryAdd(++index, value);
+        public bool Add(char value) => characters.TryAdd(index++, value);
 
-        public bool Add(int value) => characters.TryAdd(++index, value);
+        public bool Add(int value) => characters.TryAdd(index++, value);
 
-        public bool Add(Range value) => ranges.TryAdd(++index, value);
+        public bool Add(Range value) => ranges.TryAdd(index++, value);
     
         public bool TryGet(int index, out char value)
         {

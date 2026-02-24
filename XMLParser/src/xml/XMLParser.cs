@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using xml_parser.src.xml;
+using XmlParser.src.xml;
 
 namespace XmlParser.src.xml
 {
@@ -15,7 +15,7 @@ namespace XmlParser.src.xml
         public XMLFileException(FileInfo file) : base($"{file.FullName} is not a XML file.") { }
     }
 
-    internal class XMLParser
+    public class XMLParser
     {
         private FileInfo XMLFile;
         private StringBuilder content;
@@ -88,7 +88,11 @@ namespace XmlParser.src.xml
                 value += current;
             }
 
-            result = new Pair<string, string>(key, value);
+            result = new Pair<string, string>
+            {
+                Key = key,
+                Value = value
+            };
             return result;
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xml_parser.src.xml
+namespace XmlParser.src.xml
 {
     /// <summary>
     /// Basic wrapper class for a kev value pair, just without the unessesarily long name.

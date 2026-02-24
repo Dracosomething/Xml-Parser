@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xml_parser.src.xml.dtd
+namespace XmlParser.src.xml.dtd
 {
     enum Instruction
     {
