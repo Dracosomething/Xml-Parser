@@ -18,12 +18,13 @@ namespace XmlParser
         {
             //var parser = new DTDParser("./Resources/dummy.dtd");
             //Console.WriteLine();
-            var validator = new EBNFParser("./Resources/xml10.ebnf");
-            //string toCheck = "<!-- declare the parameter entity \"ISOLat2\"... -->";
-            //var result = validator.Validate(toCheck, 15);
+            var validator = new EBNFValidator();
+            validator.ReadyValidatorForUse(15, "./Resources/xml10.ebnf");
+            string toCheck = "<!-- declare the parameter entity \"ISOLat2\"... -->";
+            var result = validator.Validate(toCheck);
+            validator.ReadyValidatorForUse(45, "./Resources/xml10.ebnf");
             string another = "<!ELEMENT p (#PCDATA|a|ul|b|i|em)*>";
-            var secondResult = validator.Validate(another, 45);
-            Console.WriteLine(/*result + */"    " + secondResult);
+            var secondResult = validator.Validate(another);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -101,6 +101,11 @@ namespace XmlParser.src.EBNF
         private string path;
         private Dictionary<string, EBNFTokens> parsed = new Dictionary<string, EBNFTokens>();
 
+        public Dictionary<string, EBNFTokens> Parsed
+        {
+            get => parsed;
+        }
+
         public EBNFParser(string path)
         {
             if (!Path.Exists(path))
@@ -128,7 +133,7 @@ namespace XmlParser.src.EBNF
             return line == null ? "" : line;
         }
 
-        public bool Validate(string text, int index)
+        public EBNFTokens Ready(int index)
         {
             var decleration = GetExpression(index);
             var tokenized = decleration.Split("::=");
@@ -145,10 +150,7 @@ namespace XmlParser.src.EBNF
                 tokens = Parse(expression, ref tmp);
                 parsed[name] = tokens;
             }
-            int tmpLen = 0;
-            tokens.SetReferenced(parsed);
-            var tmpDic = new Dictionary<Pair<int, int>, Pair<int, string>>();
-            return tokens.Validate(text, ref tmpLen, ref tmpDic);
+            return tokens;
         }
 
         private EBNFTokens Parse(string expresion, ref List<string> stack)

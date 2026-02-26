@@ -13,6 +13,15 @@ namespace XmlParser.src.EBNF
         public Type Type { get; init; }
         public object Data { get; init; }
 
+        /// <summary>
+        /// rule HEXADECIMAL stores data as an integer<br/>
+        /// rule COLLECTION stores data as an EBNFCollection<br/>
+        /// rule STRING and rule POINTER stores data as a string<br/>
+        /// rule GROUP and rule REFERENCE store data as EBNFTokens
+        /// </summary>
+        /// <typeparam name="T">The type of the output data.</typeparam>
+        /// <param name="output">The data to output</param>
+        /// <returns>true if data was succesfully extracted.</returns>
         public bool GetData<T>(out T output)
         {
             if (typeof(T) == Type && Data is T)
@@ -22,62 +31,6 @@ namespace XmlParser.src.EBNF
             }
             output = default!;
             return false;
-        }
-
-        public bool Check(string check, ref int index, ref Dictionary<Pair<int, int>, Pair<int, string>> saved)
-        {
-            bool success;
-            int length = 0;
-            switch (Rule)
-            {
-                case EBNFToken.STRING:
-                    string output;
-                    success = GetData(out output);
-                    if (!success)
-                        return false;
-                    var result = check.Substring(index, output.Length) == output;
-                    index += output.Length;
-                    return result;
-                case EBNFToken.COLLECTION:
-                    success = GetData(out EBNFCollection collection);
-                    if (!success)
-                        return false;
-                    return collection.Check(check[index++]);
-                case EBNFToken.GROUP:
-                    success = GetData(out EBNFTokens group);
-                    if (!success)
-                        return false;
-                    return group.Validate(check.Substring(index), ref length, ref saved, );
-                case EBNFToken.HEXADECIMAL:
-                    success = GetData(out int number);
-                    if (!success)
-                        return false;
-                    return check[index++] == number;
-                case EBNFToken.REFERENCE:
-                    success = GetData(out EBNFTokens reference);
-                    if (!success)
-                        return false;
-                    return reference.Validate(check.Substring(index), ref length, ref saved);
-            }
-            index += length;
-            return false;
-        }
-
-        public bool Check(string check, EBNFExpression next, int i, ref int index, ref Dictionary<Pair<int, int>, Pair<int, string>> saved)
-        {
-            var success = GetData(out string name);
-            if (!success)
-                return false;
-            int length = 0;
-            int startIndex = index;
-            while (!next.Check(check, ref index, ref saved))
-            {
-                length++;
-                if (index >= check.Length)
-                    return false;
-            }
-            saved.Add(new Pair<int, int> { Key = index, Value = length}, new Pair<int, string> { Key = i, Value = name });
-            return true;
         }
     }
 }
