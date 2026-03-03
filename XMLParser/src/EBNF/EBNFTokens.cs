@@ -1,4 +1,5 @@
-﻿using XmlParser.src.xml;
+﻿using System.Text;
+using XmlParser.src.xml;
 
 namespace XmlParser.src.EBNF
 {
@@ -117,11 +118,21 @@ namespace XmlParser.src.EBNF
 
         public bool GetToken(int index, out Tripple<EBNFUnificationRule, EBNFQuantifier, EBNFExpression>? token)
         {
-            var res = tokens.TryGetValue(index, out Tripple<EBNFUnificationRule, EBNFQuantifier, EBNFExpression>? tripple);
-            token = tripple;
-            if (tripple == null)
+            var res = tokens.TryGetValue(index, out token);
+            if (token == null)
                 return false;
             return res;
+        }
+    
+        public string ToString()
+        {
+            StringBuilder builder = new();
+            builder.Append("index: ").Append(index).AppendLine();
+            foreach (var pair in tokens)
+            {
+                builder.Append("{ ").Append(pair.Key).Append(" => ").Append(pair.Value).Append(" }, ");
+            }
+            return builder.ToString();
         }
     }
 }

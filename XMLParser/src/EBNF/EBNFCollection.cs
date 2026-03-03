@@ -9,14 +9,15 @@ namespace XmlParser.src.EBNF
         private Dictionary<int, int> characters = new Dictionary<int, int>();
         private Dictionary<int, Range> ranges = new Dictionary<int, Range>();
         private int index = 0;
+        private bool not = false;
         
         public bool Not
         {
-            get;
+            get => not;
             set
             {
-                if (Not) return;
-                Not = value;
+                if (not) return;
+                not = value;
             }
         }
 
@@ -76,6 +77,24 @@ namespace XmlParser.src.EBNF
                 }
             }
             return false;
+        }
+    
+        public string ToString()
+        {
+            StringBuilder builder = new();
+            builder.Append("index: ").Append(index).AppendLine();
+            builder.Append("inverse: ").Append(not).AppendLine();
+            for (int i = 0; i < index; i++)
+            {
+                builder.Append("{ ");
+                builder.Append("[").Append(i).Append("] => ");
+                if (characters.ContainsKey(i))
+                    builder.Append(characters[i]).Append("/").Append((char)characters[i]);
+                else
+                    builder.Append(ranges[i]);
+                builder.Append(" }, ");
+            }
+            return builder.ToString();
         }
     }
 }

@@ -35,6 +35,8 @@ namespace XmlParser.src
         // EBNF tokens
         public static readonly string range = @"\[^?(([a-zA-Z0-9]|(#x[a-fA-F0-9]{1,5}))\-([a-zA-Z0-9]|(#x[a-fA-F0-9]{1,5})))+]";
 
+        public static readonly string assignmentOpperator = "::=";
+
         // Character Range
         public static readonly string chararacter = "(\\t|\\n|\\r|[\\u0020-\\uD7FF]|[\\uE000-\\uFFFD])";
 

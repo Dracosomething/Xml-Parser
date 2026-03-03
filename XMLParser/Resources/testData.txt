@@ -1,0 +1,128 @@
+<!-- declarations for <head> & <body> -->`15`true
+<!-- B+, B, or B--->`15`false
+<!-- Outer Comment <!-- Inner Comment -->`15`false
+<?xml-stylesheet type="text/xsl" href="main.xsl"?>`16`true
+<?test data erwer?>`16`true
+<?xml a b c d?>`16`false
+<![CDATA[<greeting>Hello, world!</greeting>]]>`18`true
+<?xml version="1.0" encoding="utf-8"?>`23`true
+<?xml version= "1.0"?>`23`true
+<?xml version ="1.0" standalone='yes'?>`23`true
+<?xml version = "1.0" encoding= "utf-16" standalone ="no"?>`23`true
+<!DOCTYPE people_list SYSTEM "example.dtd">`28`true
+<!DOCTYPE greeting [<!ELEMENT greeting (#PCDATA)>]>`28`true
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">`28`true
+<!DOCTYPE note [<!ELEMENT note (to,from,heading,body)> <!ELEMENT to (#PCDATA)><!ELEMENT from (#PCDATA)><!ELEMENT heading (#PCDATA)> <!ELEMENT body (#PCDATA)>]>`28`true
+<MyElement/>`39`true
+<MyElement></MyElement>`39`true
+<MyElement>Some Text</MyElement>`39`true
+<MyElement myAttribute="attribute value">Some Text</MyElement>`39`true
+<MyElement> <ChildElement/> </MyElement>`39`true
+<MyElement>Some <b>Mixed</b> Data</MyElement>`39`true
+<ns:MyElement>Data</ns:MyElement>`39`true
+<MyElement xmlns="myNamespace">Data</MyElement>`39`true
+<greeting>Hello, world!</greeting>`39`true
+<br/>`39`true
+<termdef id="dt-dog" term="dog">`40`true
+</termdef>`42`true
+<IMG align="left" src="http://www.w3.org/Icons/WWW/w3c_home" />`44`true
+<br></br>`44`false
+<br/>`44`true
+<!ELEMENT br EMPTY>`45`true
+<!ELEMENT p (#PCDATA|emph)* >`45`true
+<!ELEMENT %name.para; %content.para; >`45`true
+<!ELEMENT container ANY>`45`true
+<!ELEMENT spec (front, body, back?)>`45`true
+<!ELEMENT div1 (head, (p | list | note)*, div2*)>`45`true
+<!ELEMENT dictionary-body (%div.mix; | %dict.mix;)*>`45`true
+<!ATTLIST termdef id ID #REQUIRED  name CDATA #IMPLIED>`52`true
+<!ATTLIST list type (bullets|ordered|glossary) "ordered">`52`true
+<!ATTLIST form method CDATA #FIXED "POST">`52`true
+<!ENTITY d "&#xD;">`70`true
+<!ENTITY a "&#xA;">`70`true
+<!ENTITY da "&#xD;&#xA;">`70`true
+<!ENTITY % draft 'INCLUDE' >`70`true
+<!ENTITY % final 'IGNORE' >`70`true
+<!ENTITY Pub-Status "This is a pre-release of the specification.">`71`true
+<!ENTITY open-hatch SYSTEM "http://www.textuality.com/boilerplate/OpenHatch.xml">`71`true
+<!ENTITY open-hatch PUBLIC "-//Textuality//TEXT Standard open-hatch boilerplate//EN" "http://www.textuality.com/boilerplate/OpenHatch.xml">`72`false
+<!ENTITY hatch-pic SYSTEM "../grafix/OpenHatch.gif" NDATA gif >`72`false
+<!ENTITY % YN '"Yes"' >`72`true
+<!ENTITY WhatHeSaid "He said %YN;" >`71`true
+<!ENTITY EndAttr "27'" >`71`true
+<element attribute='a-&EndAttr;>`71`false
+<!ENTITY lt     "&#38;#60;">`71`true
+<!ENTITY gt     "&#62;">`71`true
+<!ENTITY amp    "&#38;#38;">`71`true
+<!ENTITY apos   "&#39;">`71`true
+<!ENTITY quot   "&#34;">`71`true
+<![INCLUDE[ <!ELEMENT book (comments*, title, body, supplements?)> ]]>`61`true
+<![IGNORE[ <!ELEMENT book (title, body, supplements?)> ]]>`61`true
+<![INCLUDE[ <!ELEMENT book (comments*, title, body, supplements?)> ]]>`62`true
+<![IGNORE[ <!ELEMENT book (title, body, supplements?)> ]]>`63`true
+<![INCLUDE[ <!ELEMENT book (comments*, title, body, supplements?)> ]]>`63`false
+<![IGNORE[ <!ELEMENT book (title, body, supplements?)> ]]>``62`false
+&#x3C;`66`true
+&docdate;`67`true
+&docdate;`68`true
+&docdate;`69`false
+&security-level;`67`true
+&security-level;`68`true
+&security-level;`69`false
+%ISOLat2;`67`true
+%ISOLat2;`68`false
+%ISOLat2;`69`true
+myAttribute="attribute value"`41`true
+xmlns:nsA="MyNamespace"`41`true
+        <MyElement nsA:myAttribute1="attribute value" myAttribute2="attribute value">...</MyElement>`39`true
+&#169;`66`true
+&#xa9;`66`true
+&#8482;`66`true
+&#x2122;`66`true
+<!-- My Comment -->`15`true
+<DocumentElement <!-- My Comment --></DocumentElement>`39`false
+<!ENTITY CompanyName 'Liquid Technologies Ltd' >`67`true
+  <!ENTITY BookChapter1 SYSTEM "Chapter1.xml">`67`true
+    <!ENTITY companyLogo PUBLIC "-//W3C//GIF logo//EN" "http://www.w3.org/logo.gif" NDATA gif>`67`true
+%addressTypes;`67`true
+<?xml version="1.0" encoding="utf-8"?>`22`true
+<!ATTLIST test myAttr CDATA #IMPLIED>`52`true
+<!ATTLIST test myAttr CDATA #REQUIRED>`52`true
+<!ATTLIST test version CDATA #FIXED '1.2'>`52`true
+<!ATTLIST test userID ID #REQUIRED>`52`true
+<!ATTLIST test fruit (apple | pear | bannan) #REQUIRED>`52`true
+<!ATTLIST test scriptEngine NOTATION (js|cs|perl) #REQUIRED>`52`true
+<!ELEMENT test (a)>`45`true
+<!ELEMENT test (a?)>`45`true
+<!ELEMENT test (a)?>`45`true
+<!ELEMENT test (a,b+)>`45`true
+<!ELEMENT test (a)>`45`true
+<!ELEMENT test (a?, b, c+, d*)>`45`true
+<!ELEMENT test (a?, b, (c?, d)*)>`45`true
+<!ELEMENT test (a | b)>`45`true
+<!ELEMENT test (a? | b | c+ | d*)>`45`true
+<!ELEMENT test (a? | b |  (c?, d)*)>`45`true
+<!ELEMENT test EMPTY>`45`true
+<!ELEMENT test EMPTY>`45`true
+<!ATTLIST test name CDATA #REQUIRED>`52`true
+<!ELEMENT test ANY>`45`true
+<!ELEMENT test ANY>`45`true
+<!ELEMENT myElm EMPTY>`45`true
+<!ELEMENT name (#PCDATA)* >`45`true
+<!ELEMENT name (#PCDATA | br | strong)* >`45`true
+<!ELEMENT name (#PCDATA, myElm)*>`45`false
+<!ELEMENT name (myElm | #PCDATA)*>`45`false
+<!ELEMENT name (#PCDATA | myElm)>`45`false
+<!ELEMENT test (a, b, c, (d | e))>`45`true
+<!ELEMENT test (a, b, ( c | (d, e)))>`45`true
+<!ELEMENT test (a, b, c, d | e)>`45`false
+<!ELEMENT test (a, b, ( c | d, e))>`45`false
+<!NOTATION jpg PUBLIC "JPG 1.0">`82`true
+<!NOTATION gif PUBLIC "GIF 1.0">`82`true
+<!NOTATION png PUBLIC "PNG 1.0">`82`true
+<!NOTATION jpg PUBLIC "JPG 1.0" "image/jpeg">`82`true
+<!NOTATION gif PUBLIC "GIF 1.0" "image/gif">`82`true
+<!NOTATION png PUBLIC "PNG 1.0" "image/png">`82`true
+<!NOTATION gif SYSTEM "image/gif">`82`true
+<!NOTATION jpg SYSTEM "image/jpeg">`82`true
+<!NOTATION png SYSTEM "image/png">`82`true

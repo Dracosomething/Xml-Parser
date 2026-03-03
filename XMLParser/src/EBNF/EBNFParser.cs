@@ -292,16 +292,22 @@ namespace XmlParser.src.EBNF
                 // skip the first 2 characters since they are allways going to be #x
                 index += 2;
                 int num;
-                ReadHexadecimal(expression, ref index).GetData(out num);
+                var hexadecimal = ReadHexadecimal(expression, ref index);
+                result += $"#x{hexadecimal.Token}";
+                var success = hexadecimal.GetData(out num);
+                if (!success)
+                    break;
                 char next = expression[index];
-                result += num;
                 if (next == '-')
                 {
                     index += 2;
                     result += '-';
                     int num2;
-                    ReadHexadecimal(expression, ref index).GetData(out num2);
-                    result += num2;
+                    hexadecimal = ReadHexadecimal(expression, ref index);
+                    result += $"#x{hexadecimal.Token}";
+                    success = hexadecimal.GetData(out num2);
+                    if (!success)
+                        break;
                     var range = new Range
                     {
                         Start = num,
@@ -318,39 +324,31 @@ namespace XmlParser.src.EBNF
 
         private void ReadCollectionNormal(string expression, ref int index, ref EBNFCollection collection, ref string result)
         {
-            bool isFirst = true;
-            bool isLast = false;
             char c;
             while (index + 1 < expression.Length && (c = expression[++index]) != ']')
             {
-                if (expression[index + 1] == ']')
-                    isLast = true;
+                char next = expression[index + 1];
                 if (c == '\\')
                 {
-                    if (isFirst)
-                        isFirst = false;
-                    char next = expression[++index];
                     if (next == ']')
                     {
                         result += next;
+                        index++;
                         continue;
                     }
-                    else
-                        index--;
                 }
                 result += c;
-                if (!isFirst && !isLast && c == '-')
+                if (next == '-')
                 {
-                    char next = expression[++index];
-                    char previous = expression[index - 2];
+                    char rangeEnd = expression[index + 2];
+                    index += 2;
+                    result += $"-{rangeEnd}";
                     var range = new Range
                     {
-                        Start = next,
-                        End = previous
+                        Start = c,
+                        End = rangeEnd
                     };
                     collection.Add(range);
-                    if (isFirst)
-                        isFirst = false;
                     continue;
                 }
                 collection.Add(c);

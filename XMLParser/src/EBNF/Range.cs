@@ -13,5 +13,13 @@ namespace XmlParser.src.EBNF
         {
             return num >= Start && num <= End;
         }
+
+        public string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.Append("start: ").Append(Start).Append(" - ");
+            builder.Append("end: ").Append(End).AppendLine();
+            return builder.ToString();
+        }
     }
 }

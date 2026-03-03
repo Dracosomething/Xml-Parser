@@ -32,5 +32,20 @@ namespace XmlParser.src.EBNF
             output = default!;
             return false;
         }
+
+        public bool Equals(EBNFExpression other)
+        {
+            return other.Rule == Rule && other.Token == Token && other.Data == Data && other.Type == Type;
+        }
+
+        public string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.Append("rule: ").Append(Rule).AppendLine();
+            builder.Append("token: ").Append(Token).AppendLine();
+            builder.Append("type: ").Append(Type.ToString()).AppendLine();
+            builder.Append("data: ").Append(Data).AppendLine();
+            return builder.ToString();
+        }
     }
 }
