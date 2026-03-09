@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using XmlParser.src;
 
-namespace XmlParser.src.xml
+namespace XmlParser.src
 {
     internal class FileReader : IDisposable
     {
@@ -44,18 +45,13 @@ namespace XmlParser.src.xml
             } 
         }
 
-        public string Read(string regex)
+        public string Read(Func<string, bool> func)
         {
-            Match match = ReadFirstMatch(regex);
-            if (match == null)
-                return null;
-            string leftOver = this.text.Substring(index);
-            if (leftOver.StartsWith(match.Value))
+            var match = ReadFirstMatch(func);
+            if (match.StartIndex == 0)
                 return Read(match.Length);
             else
-            {
-                return Read(match.Index);
-            }
+                return Read(match.StartIndex);
         }
 
         public string Peak(int amount = 1)
@@ -73,20 +69,13 @@ namespace XmlParser.src.xml
             return true;
         }
 
-        public bool SkipRegex(string regex)
+        public bool Skip(Func<string, bool> func)
         {
-            Match match = ReadFirstMatch(regex);
-            if (match == null)
-                return false;
-            string leftOver = this.text.Substring(index);
-            if (leftOver.StartsWith(match.Value))
+            var match = ReadFirstMatch(func);
+            if (match.StartIndex == 0)
                 return Skip(match.Length);
             else
-            {
-                int indexFound = match.Index;
-                int toReadAmount = this.index - indexFound;
-                return Skip(toReadAmount);
-            }
+                return Skip(match.StartIndex);
         }
 
         public bool Back(int amount = 1)
@@ -97,23 +86,13 @@ namespace XmlParser.src.xml
             return true;
         }
 
-        public bool EndOfFile()
-        {
-            return this.index >= this.text.Length - 1;
-        }
+        public bool EndOfFile() => this.index >= this.text.Length - 1;
 
-        private Match ReadFirstMatch(string regex)
+        private Match ReadFirstMatch(Func<string, bool> func)
         {
             // We only need to check the part of the file data that hasn't been read yet.
             string toCheck = text.Substring(index);
-            Console.WriteLine();
-            MatchCollection matches = Regex.Matches(toCheck, regex);
-            if (matches.Count == 0)
-                return null;
-            Match match = matches[0];
-            if (!match.Success)
-                return null;
-            return match;
+            return toCheck.FirstMatch(func);
         }
 
         public void Dispose()

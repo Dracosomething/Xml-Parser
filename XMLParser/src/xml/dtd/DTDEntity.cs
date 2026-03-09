@@ -8,19 +8,22 @@ namespace XmlParser.src.xml.dtd
 {
     internal class DTDEntity
     {
-        private string name;
-        private string value;
-        private bool global;
+        public string Name { get; init; }
+        public string Value { get; init; }
+        public bool IsGlobal { get; init; }
+        public bool Initialized { get; init; }
 
-        public string Name { get => name; }
-        public string Value { get => value; }
-        public bool IsGlobal { get => global; }
-
-        public DTDEntity(string name, string value, bool global)
+        public DTDEntity(string name, string value, bool isGlobal)
         {
-            this.name = name;
-            this.value = value;
-            this.global = global;
+            Name = name;
+            Value = value;
+            IsGlobal = isGlobal;
+            Initialized = true;
+        }
+
+        public DTDEntity()
+        {
+            Initialized = false;
         }
     }
 }

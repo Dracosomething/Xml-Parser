@@ -43,16 +43,6 @@ namespace XmlParser.src.xml.dtd
             attributes.Add(item);
         }
 
-        public DTDAttribute this[int i]
-        {
-            get
-            {
-                return this.attributes[i]; 
-            }
-            set
-            {
-                this.attributes[i] = value;
-            }
-        }
+        public DTDAttribute this[int i] => attributes[i];
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using XmlParser.src.EBNF;
+using XmlParser.src;
 using XmlParser.src.gui;
-using XmlParser.src.test;
 
 namespace XmlParser
 {
@@ -17,11 +17,17 @@ namespace XmlParser
         [STAThread]
         static void Main()
         {
-            EBNFTest.Run();
+            // parsing steps
+            // step 1: check for dtd
+            // step 1.1: if dtd exists do pre processor and replace all references and load in entity declarations.
+            // step 1.2: parse dtd and load everything declared into memory
+            // step 1.3: get root element
+            // step 2: run pre prossesor over xml file
+            // step 3: parse xml file
 
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainWindow());
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainWindow());
         }
     }
 }

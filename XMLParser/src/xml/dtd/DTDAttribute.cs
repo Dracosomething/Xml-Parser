@@ -9,24 +9,9 @@ namespace XmlParser.src.xml.dtd
 {
     internal class DTDAttribute
     {
-        private string name;
-        private Pair<DTDDataType, List<string>> datatype;
-        private Pair<DTDDeclarationType, string> attributeDefault;
-
-        public string Name
-        {
-            get => name;
-        }
-
-        public Pair<DTDDataType, List<string>> DataType
-        {
-            get => datatype;
-        }
-
-        public Pair<DTDDeclarationType, string> AttributeDefault
-        {
-            get => attributeDefault;
-        }
+        public string Name { get; }
+        public Pair<DTDDataType, List<string>> DataType { get; }
+        public Pair<DTDDeclarationType, string> AttributeDefault { get; }
 
         public DTDAttribute(string name, DTDDataType dataType, DTDDeclarationType declarationType, string value = null)
         {
@@ -34,13 +19,13 @@ namespace XmlParser.src.xml.dtd
                 throw new ArgumentNullException("value");
             if (dataType == DTDDataType.ENUMERATION || dataType == DTDDataType.NOTATION)
                 throw new ArgumentException("Param can not be of an enumeration type", "dataType");
-            this.name = name;
-            this.datatype = new Pair<DTDDataType, List<string>>
+            Name = name;
+            Datatype = new Pair<DTDDataType, List<string>>
             {
                 Key = dataType,
                 Value = null
             };
-            this.attributeDefault = new Pair<DTDDeclarationType, string>
+            AttributeDefault = new Pair<DTDDeclarationType, string>
             {
                 Key = declarationType,
                 Value = value
@@ -53,13 +38,13 @@ namespace XmlParser.src.xml.dtd
                 throw new ArgumentNullException("value");
             if (dataType != DTDDataType.ENUMERATION || dataType != DTDDataType.NOTATION)
                 throw new ArgumentException("Param must be of an enumeration type", "dataType");
-            this.name = name;
-            this.datatype = new Pair<DTDDataType, List<string>>
+            Name = name;
+            Datatype = new Pair<DTDDataType, List<string>>
             {
                 Key = dataType,
                 Value = enumeration
             };
-            this.attributeDefault = new Pair<DTDDeclarationType, string>
+            AttributeDefault = new Pair<DTDDeclarationType, string>
             {
                 Key = declarationType,
                 Value = value

@@ -28,5 +28,9 @@ namespace XmlParser.src.xml
             builder.Append("]");
             return base.ToString();
         }
+
+        public static explicit operator Pair<K, V>(KeyValuePair<K, V> pair) => new Pair<K, V> { Key = pair.Key, Value = pair.Value };
+
+        public static implicit operator KeyValuePair<K, V>(Pair<K, V> pair) => new KeyValuePair<K, V>(pair.Key, pair.Value);
     }
 }

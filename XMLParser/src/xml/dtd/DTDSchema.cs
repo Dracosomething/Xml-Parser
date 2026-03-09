@@ -21,48 +21,30 @@ namespace XmlParser.src.xml
             elements = new List<DTDElement>();
             entities = new List<DTDEntity>();
             notations = new List<DTDNotation>();
-            buildInEntities = new List<DTDEntity> { 
+            buildInEntities = new()
+            { 
                 new DTDEntity("lt", "<", true), 
                 new DTDEntity("gt", ">", true), 
                 new DTDEntity("quot", "\"", true),
                 new DTDEntity("apos", "'", true),
-                new DTDEntity("amp", "&", true)};
+                new DTDEntity("amp", "&", true)
+            };
         }
 
-        public void addAtrributeList(DTDAttList list)
-        {
-            this.attributeLists.Add(list);
-        }
+        public void addAtrributeList(DTDAttList list) => this.attributeLists.Add(list);
 
-        public void addElement(DTDElement element)
-        {
-            this.elements.Add(element);
-        }
-
-        public void addEntity(DTDEntity entity)
-        {
-            this.entities.Add(entity);
-        }
-
-        public void addNotation(DTDNotation notation)
-        {
-            this.notations.Add(notation);
-        }
-
-        public DTDEntity getEntity(string name, bool inDTDFile)
-        {
-            return this.entities.Find((entity) =>
-            {
-                if (!inDTDFile)
-                    return entity.IsGlobal && entity.Name == name;
-                return entity.Name == name;
-            });
-        }
+        public void addElement(DTDElement element) => this.elements.Add(element);
         
-        public DTDEntity getBuildInEntity(string name)
-        {
-            return this.buildInEntities.Find((entity) => entity.Name == name);
-        }
+        public void addEntity(DTDEntity entity) => this.entities.Add(entity);
+
+        public void addNotation(DTDNotation notation) => this.notations.Add(notation);
+
+        public DTDEntity getEntity(string name, bool inDTDFile) => 
+            entities.Find((entity) => entity.IsGlobal == !inDTDFile && entity.Name == name) ?? new DTDEntity();
+        
+        
+        public DTDEntity getBuildInEntity(string name) => 
+            buildInEntities.Find((entity) => entity.Name == name) ?? new DTDEntity();
 
         public void Combine(DTDSchema other)
         {

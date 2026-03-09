@@ -20,12 +20,28 @@ namespace XmlParser.src.xml.dtd
         private List<Pair<DTDSequence, Pair<string, Instruction>>> sequence;
         private List<Pair<DTDSequence, Pair<string, Instruction>>> optionals;
         private int size;
-        private string charData;
+        private string CharData { get; init; }
 
-        public string CharData
+        public Pair<DTDSequence, Pair<string, Instruction>> this[int i]
         {
-            get { return charData; }
-            set { charData = value; }
+            get
+            {
+                if (i > this.sequence.Count)
+                {
+                    return this.optionals[i - this.sequence.Count];
+                }
+                else
+                    return this.sequence[i];
+            }
+            set
+            {
+                if (i > this.sequence.Count)
+                {
+                    this.optionals[i - this.sequence.Count] = value;
+                }
+                else
+                    this.sequence[i] = value;
+            }
         }
 
         public DTDSequence()
@@ -89,28 +105,6 @@ namespace XmlParser.src.xml.dtd
                 this.size++;
             }
             return res;
-        }
-
-        public Pair<DTDSequence, Pair<string, Instruction>> this[int i]
-        {
-            get
-            {
-                if (i > this.sequence.Count)
-                {
-                    return this.optionals[i - this.sequence.Count];
-                }
-                else
-                    return this.sequence[i];
-            }
-            set
-            {
-                if (i > this.sequence.Count)
-                {
-                    this.optionals[i - this.sequence.Count] = value;
-                }
-                else
-                    this.sequence[i] = value;
-            }
         }
     }
 }

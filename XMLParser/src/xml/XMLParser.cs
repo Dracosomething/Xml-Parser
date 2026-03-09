@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using XmlParser.src.xml;
+using XmlParser.src;
 
 namespace XmlParser.src.xml
 {
