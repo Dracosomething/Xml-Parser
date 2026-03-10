@@ -47,7 +47,7 @@ namespace XmlParser.src
         }
 
         public static int RegexCount(string value, string regex)
-        {
+        {   
             var reg = new Regex(regex);
             MatchCollection matches = reg.Matches(regex);
             return matches.Count;
@@ -150,8 +150,6 @@ namespace XmlParser.src
                 var match = str.FirstMatch(func);
                 return match.Found && match.EndIndex == str.Length - 1;
             }
-
-            // need allmatch function that checks if all characters match a function
         }
     }
 }

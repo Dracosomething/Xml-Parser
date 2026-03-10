@@ -4,7 +4,7 @@ using System.Text;
 using XmlParser.src;
 using XmlParser.src.xml;
 
-namespace XMLParser.src.xml
+namespace XmlParser.src.xml
 {
     /// <summary>
     /// Lookup table for every xml related expresion
@@ -26,12 +26,59 @@ namespace XMLParser.src.xml
     /// </summary>
     internal class XMLLookupTable
     {
-        private GenericXMLLookupTable GenericXMLLookupTable = new();
-        private LookupTable<string, Func<string, bool>> table = new(
-            new Dictionary<string, Func<string, bool>>
-            {
+        private GenericXMLLookupTable GenericXMLLookupTable;
+        private LookupTable<string, Func<string, bool>> table;
 
-            }
-        );
+        public XMLLookupTable(bool isXML10)
+        {
+            GenericXMLLookupTable = new(isXML10);
+            table = new(
+                new Dictionary<string, Func<string, bool>> 
+                {
+                    { "CharData"        , ReadCharacterData                 },
+                    { "CDSect"          , ReadCharacterDataSection          },
+                    { "prolog"          , ReadProlog                        },
+                    { "XMLDecleration"  , ReadXMLDeclreration               },
+                    { "doctypedecl"     , ReadDocumentTypeDecleration       },
+                    { "SDDecl"          , ReadstandaloneDocumentDecleration },
+                    { "element"         , ReadElement                       },
+                    { "STag"            , ReadStartTag                      },
+                    { "Attribute"       , ReadAttribute                     },
+                    { "ETag"            , ReadEndTag                        },
+                    { "content"         , ReadContent                       },
+                    { "EmptyElemTag"    , ReadEmptyElementTag               }
+                }
+            );
+        }
+
+        //[^<&]* - ([^<&]* ']]>' [^<&]*)
+        private bool ReadCharacterData(string toCheckString) => 
+            Constants.RegexMatch(toCheckString, "[^<&]*") && !toCheckString.Contains("]]>");
+
+        private bool ReadCharacterDataSection(string toCheckString)
+        {
+            // '<![CDATA[' (Char* - (Char* ']]>' Char*)) ']]>'
+            if (!toCheckString.StartsWith("<![CDATA[") && !toCheckString.EndsWith("]]>"))
+                return false;
+            int bodyEndIndex = toCheckString.Length - 1 - 3; // remove 1 cuz length will always be 1 longer then index and remove 3 since "]]>" is 3 characters long
+            string body = toCheckString.Remove(0, "<![CDATA[".Length).Remove(bodyEndIndex, "]]>".Length);
+            var charExpression = GenericXMLLookupTable["Char"];
+            return body.All(c => charExpression(c.ToString())) && !body.Contains("]]>");
+        }
+
+        private bool ReadProlog(string toCheckString)
+        {
+            // XMLDecl? Misc* (doctypedecl Misc*)?
+        }
+
+        private bool ReadXMLDeclreration(string toCheckString)
+        {
+            // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
+            if (!toCheckString.StartsWith("<?xml") || !toCheckString.EndsWith("?>"))
+                return false;
+            int bodyEndIndex = toCheckString.Length - 1 - 2; // remove 1 cuz the length is always 1 longer then the index and remove 2 cuz "?>".Length is 2 
+            var versionInfoExpression = GenericXMLLookupTable[""];
+
+        }
     }
 }

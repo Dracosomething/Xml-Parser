@@ -8,7 +8,7 @@ namespace XmlParser.src
     {
         public int StartIndex { get; init; }
         public int EndIndex { get; init; }
-        public readonly int Length => StartIndex - EndIndex;
+        public readonly int Length => EndIndex - StartIndex;
         public string Result { get; init; }
         public bool Found { get; init; }
     }

@@ -39,38 +39,46 @@ namespace XmlParser.src.xml
     /// </summary>
     internal class GenericXMLLookupTable
     {
-        private LookupTable<string, Func<string, bool>> table = new(
-             new Dictionary<string, Func<string, bool>>()
-             {
-                { "Char_XML10"      , ValidateCharacterXML10            },
-                { "Char_XML11"      , ValidateCharacterXML11            },
-                { "Space"           , IsSpace                           },
-                { "RestrictedChar"  , IsRestrictedCharacter             },
-                { "NameStartChar"   , ReadNameStartCharacter            },
-                { "NameChar"        , ReadNameCharacter                 },
-                { "Name"            , ReadName                          },
-                { "Names"           , ReadNames                         },
-                { "AttValue"        , ReadAttributeValue                },
-                { "SystemLiteral"   , ReadSystemLiteral                 },
-                { "PubidLiteral"    , ReadPubidLiteral                  },
-                { "Comment"         , ReadComment                       },
-                { "PI"              , ReadProcessingInstruction         },
-                { "VersionInfo"     , ReadVersionInfo                   },
-                { "Eq"              , ReadEquals                        },
-                { "VersionNum"      , ReadVersionNum                    },
-                { "Misc"            , ReadMisc                          },
-                { "CharRef"         , ReadCharacterReference            },
-                { "Reference"       , ReadReference                     },
-                { "EntityRef"       , ReadEntityReference               },
-                { "PEReference"     , ReadParsedEntityReference         },
-                { "EncodingDecl"    , ReadEncodingDecleration           },
-                { "EncName"         , ReadEncodingName                  }
-             }
-        );
+        private bool isXML10;
+        private LookupTable<string, Func<string, bool>> table;
+
+        public GenericXMLLookupTable(bool isXML10)
+        {
+             table = new(
+                 new Dictionary<string, Func<string, bool>>()
+                 {
+                    { "Char_XML10"      , ValidateCharacterXML10            },
+                    { "Char_XML11"      , ValidateCharacterXML11            },
+                    { "Space"           , IsSpace                           },
+                    { "RestrictedChar"  , IsRestrictedCharacter             },
+                    { "NameStartChar"   , ReadNameStartCharacter            },
+                    { "NameChar"        , ReadNameCharacter                 },
+                    { "Name"            , ReadName                          },
+                    { "Names"           , ReadNames                         },
+                    { "AttValue"        , ReadAttributeValue                },
+                    { "SystemLiteral"   , ReadSystemLiteral                 },
+                    { "PubidLiteral"    , ReadPubidLiteral                  },
+                    { "Comment"         , ReadComment                       },
+                    { "PI"              , ReadProcessingInstruction         },
+                    { "VersionInfo"     , ReadVersionInfo                   },
+                    { "Eq"              , ReadEquals                        },
+                    { "VersionNum"      , ReadVersionNum                    },
+                    { "Misc"            , ReadMisc                          },
+                    { "CharRef"         , ReadCharacterReference            },
+                    { "Reference"       , ReadReference                     },
+                    { "EntityRef"       , ReadEntityReference               },
+                    { "PEReference"     , ReadParsedEntityReference         },
+                    { "EncodingDecl"    , ReadEncodingDecleration           },
+                    { "EncName"         , ReadEncodingName                  },
+                    { "Char"            , ValidateCharacter                 }
+                 }
+            );
+            this.isXML10 = isXML10;
+        }
 
         public Func<string, bool> this[string str] => table[str];
 
-        private static bool ValidateCharacterXML10(string toCheckString)
+        private bool ValidateCharacterXML10(string toCheckString)
         {
             // 	#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
             if (toCheckString.Length != 1)
@@ -80,7 +88,7 @@ namespace XmlParser.src.xml
             return Constants.RegexMatch(toCheckString, "\\t|\\n|\\r|[\\s-\\uD7FF]|[\\uE000-\\uFFFD]") || (toCheckChar >= 0x10000 && toCheckChar <= 0x10FFFF);
         }
 
-        private static bool ValidateCharacterXML11(string toCheckString)
+        private bool ValidateCharacterXML11(string toCheckString)
         {
             // 	[#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
             if (toCheckString.Length != 1)
@@ -90,10 +98,13 @@ namespace XmlParser.src.xml
             return Constants.RegexMatch(toCheckString, "[\\x01-\\uD7FF]|[\\uE000-\\uFFFD]") || (toCheckChar >= 0x10000 && toCheckChar <= 0x10FFFF);
         }
 
-        // (#x20 | #x9 | #xD | #xA)+
-        private static bool IsSpace(string toCheckString) => Constants.RegexMatch(toCheckString, "(\\s|\\t|\\r|\\n)+");
+        private bool ValidateCharacter(string toCheckString) => 
+            isXML10 ? ValidateCharacterXML10(toCheckString) : ValidateCharacterXML11(toCheckString);
 
-        private static bool IsRestrictedCharacter(string toCheckString)
+        // (#x20 | #x9 | #xD | #xA)+
+        private bool IsSpace(string toCheckString) => Constants.RegexMatch(toCheckString, "(\\s|\\t|\\r|\\n)+");
+
+        private bool IsRestrictedCharacter(string toCheckString)
         {
             // [#x1-#x8] | [#xB-#xC] | [#xE-#x1F] | [#x7F-#x84] | [#x86-#x9F]
             if (toCheckString.Length != 1)
@@ -101,7 +112,7 @@ namespace XmlParser.src.xml
             return Constants.RegexMatch(toCheckString, "[\\x01-\\x08]|[\\x0B-\\x0C]|[\\x0E-\\x1F]|[\\x7F-\\x84]|[\\x86-\\x9F]");
         }
 
-        private static bool ReadNameStartCharacter(string toCheckString)
+        private bool ReadNameStartCharacter(string toCheckString)
         {
             // ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] |
             // [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -112,23 +123,23 @@ namespace XmlParser.src.xml
                 "[、-\\uD7FF]|[豈-\\uFDCF]|[\\uFDF0-\\uFFFD]") || (toCheckChar >= 0x10000 && toCheckChar <= 0xEFFFF);
         }
 
-        private static bool ReadNameCharacter(string toCheckString)
+        private bool ReadNameCharacter(string toCheckString)
         {
             //  NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
             if (toCheckString.Length != 1)
                 return false;
-            return ReadNameStartChar(toCheckString) ||          // unicode 203f to unicode 2040
+            return ReadNameStartCharacter(toCheckString) ||          // unicode 203f to unicode 2040
                 Constants.RegexMatch(toCheckString, "-|\\.|[0-9]|·|[\\u0300-\\u036F]|[‿-⁀]");
         }
 
-        private static bool ReadName(string toCheckString)
+        private bool ReadName(string toCheckString)
         {
             // 	NameStartChar (NameChar)*
             if (toCheckString.Length < 1)
                 return false;
             string firstCharacter = toCheckString.First().ToString();
             // nameStartChar
-            bool result = ReadNameStartChar(firstCharacter);
+            bool result = ReadNameStartCharacter(firstCharacter);
             // only check further if we have more string left
             if (toCheckString.Length > 1)
             {
@@ -137,7 +148,7 @@ namespace XmlParser.src.xml
                 foreach (char c in leftOverToCheck)
                 {
                     // NameChar
-                    if (!ReadNameChar(c.ToString()))
+                    if (!ReadNameCharacter(c.ToString()))
                         break; // break here since this would be the last occurance of c
                 }
             }
@@ -145,7 +156,7 @@ namespace XmlParser.src.xml
             return result;
         }
 
-        private static bool ReadNames(string toCheckString)
+        private bool ReadNames(string toCheckString)
         {
             // Name (#x20 Name)*
             if (toCheckString.Length < 1)
@@ -162,7 +173,7 @@ namespace XmlParser.src.xml
             return result; // only result matters
         }
 
-        private static bool ReadAttributeValue(string toCheckString)
+        private bool ReadAttributeValue(string toCheckString)
         {
             // '"' ([^<&"] | Reference)* '"' | "'" ([^<&'] | Reference)* "'"
             if (toCheckString.Length < 2) // make shure string is at least 2 characters long
@@ -175,7 +186,7 @@ namespace XmlParser.src.xml
             return Constants.RegexMatch(unquoted, $"[^<{quote}]*"); // we can ignore references since they will already be included this way.
         }
 
-        private static bool ReadSystemLiteral(string toCheckString)
+        private bool ReadSystemLiteral(string toCheckString)
         {
             // ('"' [^"]* '"') | ("'" [^']* "'")
             if (toCheckString.Length < 2) // make shure string is at least 2 characters long
@@ -188,7 +199,7 @@ namespace XmlParser.src.xml
             return Constants.RegexMatch(unquoted, $"[^{quote}]*");
         }
     
-        private static bool ReadPubidLiteral(string toCheckString)
+        private bool ReadPubidLiteral(string toCheckString)
         {
             // '"' PubidChar* '"' | "'" (PubidChar - "'")* "'"
             if (toCheckString.Length < 2) // make shure string is at least 2 characters long
@@ -202,7 +213,7 @@ namespace XmlParser.src.xml
             return Constants.RegexMatch(unquoted, $"\\s|\\r|\\n|[a-zA-Z0-9]|[-{(quote == '"' ? '\'' : "")}()+,./:=?;!*#@$_%]");
         }
 
-        private static bool ReadComment(string toCheckString)
+        private bool ReadComment(string toCheckString)
         {
             // '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
             if (toCheckString.Length < 7) // string has to be at least 7 characters long
@@ -217,13 +228,13 @@ namespace XmlParser.src.xml
                 if (c == '-')
                     if (commentBody[i + 1] == '-')
                         return false;
-                if (!ValidateCharacterXML10(c.ToString()))
+                if (!ValidateCharacter(c.ToString()))
                     return false;
             }
             return result;
         }
 
-        private static bool ReadProcessingInstruction(string toCheckString)
+        private bool ReadProcessingInstruction(string toCheckString)
         {
             // '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>'
             // Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
@@ -245,9 +256,115 @@ namespace XmlParser.src.xml
                 return false;
             body = body.Remove(match.StartIndex, match.Length);
             // (Char* - (Char* '?>' Char*))
-            if (!body.All(c => ValidateCharacterXML10(c.ToString())))
+            if (!body.All(c => ValidateCharacter(c.ToString())))
                 return false;
             return !body.Contains("?>");
+        }
+
+        // S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
+        private bool ReadVersionInfo(string toCheckString) => ReadDeclaration(toCheckString, "value", 3, ReadVersionNum);
+
+        private bool ReadEquals(string toCheckString)
+        {
+            // S? '=' S?
+            var result = toCheckString.FirstMatch(IsSpace);
+            if (result.Found)           
+                toCheckString = toCheckString.Remove(result.StartIndex, result.Length);
+            result = toCheckString.FirstMatch(IsSpace);
+            if (result.Found && result.StartIndex == 1)
+                toCheckString = toCheckString.Remove(result.StartIndex, result.Length);
+            return toCheckString == "=";
+        }
+
+        // '1.' [0-9]+
+        private bool ReadVersionNum(string toCheckString) => isXML10 ? toCheckString == "1.0" : toCheckString == "1.1";
+
+        // Comment | PI | S
+        private bool ReadMisc(string toCheckString) => 
+            ReadComment(toCheckString) || ReadProcessingInstruction(toCheckString) || IsSpace(toCheckString);
+        
+        private bool ReadCharacterReference(string toCheckString)
+        {
+            // '&#' [0-9]+ ';' | '&#x' [0-9a-fA-F]+ ';'
+            char referenced;
+            int semicolonIndex = toCheckString.IndexOf(';');
+            if (semicolonIndex == -1)
+                return false;
+            // convert as hex
+            if (toCheckString.StartsWith("&#x"))
+            {
+                if (toCheckString.Length < 5)
+                    return false;
+                string numberAsHexString = toCheckString.Substring(3, semicolonIndex - 4);
+                referenced = (char)Constants.IntFromHex(numberAsHexString);
+            } 
+            else
+            {
+                if (toCheckString.Length < 4)
+                    return false;
+                string numberAsString = toCheckString.Substring(2, semicolonIndex - 3);
+                referenced = (char)int.Parse(numberAsString);
+            }
+            return ValidateCharacter(referenced.ToString());
+        }
+
+        // EntityRef | CharRef
+        private bool ReadReference(string toCheckString) => ReadEntityReference(toCheckString) || ReadCharacterReference(toCheckString);
+
+        // '&' Name ';'
+        private bool ReadEntityReference(string toCheckString) => ReadReference(toCheckString, '&');
+
+        // '%' Name ';'
+        private bool ReadParsedEntityReference(string toCheckString) => ReadReference(toCheckString, '%');
+
+        private bool ReadReference(string str, char start)
+        {
+            if (!str.StartsWith(start))
+                return false;
+            str = str.Remove(0, 1);
+            int semicolonIndex = str.IndexOf(';');
+            if (semicolonIndex == -1)
+                return false;
+            string name = str.Substring(0, semicolonIndex - 1);
+            return ReadName(name);
+        }
+
+        // S 'encoding' Eq ('"' EncName '"' | "'" EncName "'" )
+        private bool ReadEncodingDecleration(string toCheckString) => ReadDeclaration(toCheckString, "encoding", 1, ReadEncodingName);
+
+        // [A-Za-z] ([A-Za-z0-9._] | '-')*    /* Encoding name contains only Latin characters */
+        private bool ReadEncodingName(string toCheckString) => Constants.RegexMatch(toCheckString, "[A-Za-z]([A-Za-z0-9._]|-)*");
+
+        private bool ReadDeclaration(string toCheckString, string name, int valueCheckLen, Func<string, bool> valueCheck)
+        {
+            const int spaceLen = 1;
+            int nameLen = name.Length;
+            const int equalsLen = 1;
+            const int quoteLen = 1;
+            int expectedLen = 14;
+            // S <name> Eq ("'" <valueCheck> "'" | '"' <valueCheck> '"')
+            if (toCheckString.Length < expectedLen) // string has to be at least 14 characters long
+                return false;
+            // S
+            var match = toCheckString.FirstMatch(IsSpace);
+            if (!match.Found || match.StartIndex != 0 
+                || match.Length >= toCheckString.Length - (expectedLen -= spaceLen)) // have to make shure that there is a space found and at the beginning,
+                return false;                                                        // and that there is enough string left over for the rest.
+            string leftOver = toCheckString.Remove(match.StartIndex, match.Length);
+            if (!leftOver.StartsWith(name)) // <name>
+                return false;
+            leftOver = leftOver.Remove(0, nameLen);
+            // Eq
+            match = leftOver.FirstMatch(ReadEquals);
+            if (!match.Found || match.StartIndex != 0 || match.Length >= toCheckString.Length - (expectedLen -= nameLen + equalsLen))
+                return false;
+            leftOver = leftOver.Remove(match.StartIndex, match.Length);
+            // ("'" <valueCheck> "'" | '"' <valueCheck> '"')
+            if (!leftOver.ContainedWithin('"') || !leftOver.ContainedWithin("'"))
+                return false;
+            char quote = leftOver.First();
+            leftOver = leftOver.Replace(quote.ToString(), "");
+            return valueCheck(leftOver);
         }
     }
 }
