@@ -51,6 +51,8 @@ namespace XmlParser.src.xml
             );
         }
 
+        public Func<string, bool> this[string str] => table[str];
+
         //[^<&]* - ([^<&]* ']]>' [^<&]*)
         private bool ReadCharacterData(string toCheckString) => 
             Constants.RegexMatch(toCheckString, "[^<&]*") && !toCheckString.Contains("]]>");
@@ -58,10 +60,17 @@ namespace XmlParser.src.xml
         private bool ReadCharacterDataSection(string toCheckString)
         {
             // '<![CDATA[' (Char* - (Char* ']]>' Char*)) ']]>'
+            if (!)
+            if (toCheckString.Length < 13)
+                return false;
             if (!toCheckString.StartsWith("<![CDATA[") && !toCheckString.EndsWith("]]>"))
                 return false;
+
+            int bodyStartIndex = "<![CDATA[".Length - 1;
             int bodyEndIndex = toCheckString.Length - 1 - 3; // remove 1 cuz length will always be 1 longer then index and remove 3 since "]]>" is 3 characters long
-            string body = toCheckString.Remove(0, "<![CDATA[".Length).Remove(bodyEndIndex, "]]>".Length);
+            int bodyLength = bodyEndIndex - bodyStartIndex;
+
+            string body = toCheckString.Substring(bodyStartIndex, bodyLength);
             var charExpression = GenericXMLLookupTable["Char"];
             return body.All(c => charExpression(c.ToString())) && !body.Contains("]]>");
         }
@@ -76,9 +85,15 @@ namespace XmlParser.src.xml
             // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
             if (!toCheckString.StartsWith("<?xml") || !toCheckString.EndsWith("?>"))
                 return false;
-            int bodyEndIndex = toCheckString.Length - 1 - 2; // remove 1 cuz the length is always 1 longer then the index and remove 2 cuz "?>".Length is 2 
-            var versionInfoExpression = GenericXMLLookupTable[""];
 
+            int bodyStartIndex = "<?xml".Length - 1;
+            int bodyEndIndex = toCheckString.Length - 1 - 2; // remove 1 cuz the length is always 1 longer then the index and remove 2 cuz "?>".Length is 2 
+            int bodyLength = bodyEndIndex - bodyStartIndex;
+
+            string leftover = toCheckString.Substring(bodyStartIndex, bodyLength);
+            var versionInfoExpression = GenericXMLLookupTable["VersionInfo"];
+            var match = leftover.FirstMatch(versionInfoExpression);
+            
         }
     }
 }

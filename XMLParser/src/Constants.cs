@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Policy;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
+﻿using System.Text.RegularExpressions;
 using XmlParser.src.gui;
-using XmlParser.src;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace XmlParser.src
 {
+    internal delegate string FormatSupplier(char quote);
+
+    internal delegate bool MatchDelegate(Match match);
+
     internal static class Constants
     {
         // made static since we only need one colorscheme for the entire program.
@@ -128,6 +122,10 @@ namespace XmlParser.src
 
             public bool ContainedWithin(string _string) => str.StartsWith(_string) && str.EndsWith(_string);
 
+            public bool ContainedWithin(char start, char end) => str.StartsWith(start) && str.EndsWith(end);
+
+            public bool ContainedWithin(string start, string end) => str.StartsWith(start) && str.EndsWith(end);
+
             public bool Contains(Func<string, bool> func)
             {
                 for (int i = 0; i < str.Length; i++)
@@ -150,6 +148,10 @@ namespace XmlParser.src
                 var match = str.FirstMatch(func);
                 return match.Found && match.EndIndex == str.Length - 1;
             }
+
+            public int EndIndex => str.Length - 1;
+
+            public string Substring(Range range) => str.Substring(range.StartIndex, range.Length);
         }
     }
 }

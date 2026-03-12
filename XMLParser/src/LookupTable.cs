@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using XmlParser.src.xml;
-using XMLParser.src;
 
 namespace XmlParser.src
 {
     internal class LookupTable<TKey, TValue>
+        where TKey : notnull
+        where TValue : notnull
     {
         // implementation needed
         // requires a dictionary and only an add method
@@ -52,7 +49,7 @@ namespace XmlParser.src
             bool success = table.TryGetValue(key, out TValue? value);
             if (!success)
                 throw new KeyNotFoundException();
-            return new Pair<TKey, TValue> { Key = key, Value = value };
+            return new Pair<TKey, TValue> { Key = key, Value = value! };
         }
 
         public TValue Get(TKey key) 
@@ -60,7 +57,7 @@ namespace XmlParser.src
             bool success = table.TryGetValue(key, out TValue? value);
             if (!success)
                 throw new KeyNotFoundException();
-            return value;
+            return value!;
         }
 
         public bool TryGet(TKey key, out Pair<TKey, TValue> pair)
@@ -71,7 +68,7 @@ namespace XmlParser.src
                 pair = new Pair<TKey, TValue> { Key = key, Value = value };
                 return true;
             }
-            pair = new Pair<TKey, TValue> { Key = default, Value = default };
+            pair = new Pair<TKey, TValue> { Key = default!, Value = default! };
             return false;
         }
 
