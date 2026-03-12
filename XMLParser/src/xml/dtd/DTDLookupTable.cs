@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XmlParser.src;
+﻿using XmlParser.src;
 using XmlParser.src.xml;
+using Range = XmlParser.src.Range;
 
 namespace XMLParser.src.xml.dtd
 {
@@ -15,7 +13,7 @@ namespace XMLParser.src.xml.dtd
     /// [28b]  intSubset           ::=       (markupdecl | DeclSep)*
     /// [29]   markupdecl          ::=       elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment     [VC: Proper Declaration/PE Nesting]
     /// [30]   extSubset           ::=       TextDecl? extSubsetDecl
-    /// [31]   extSubsetDecl       ::=       ( markupdecl | conditionalSect | DeclSep)*
+    /// [31]   extSubsetDecl       ::=       (markupdecl | conditionalSect | DeclSep)*
     /// [45]   elementdecl         ::=       '<!ELEMENT' S Name S contentspec S? '>'    [VC: Unique Element Type Declaration]
     /// [46]   contentspec         ::=       'EMPTY' | 'ANY' | Mixed | children
     /// [47]   children            ::=       (choice | seq) ('?' | '*' | '+')?
@@ -49,14 +47,171 @@ namespace XMLParser.src.xml.dtd
     /// [82]   NotationDecl        ::=       '<!NOTATION' S Name S (ExternalID | PublicID) S? '>'    [VC: Unique Notation Name]
     /// [83]   PublicID            ::=       'PUBLIC' S PubidLiteral
     /// </summary>
-    internal class DTDLookupTable
+    internal class DTDLookupTable : BaseLookupTableFunctions
     {
-        private GenericXMLLookupTable GenericXMLLookupTable = new();
-        private LookupTable<string, Func<string, bool>> table = new(
-            new Dictionary<string, Func<string, bool>>
-            {
+        private GenericXMLLookupTable GenericXMLLookupTable;
+        private LookupTable<string, Func<string, bool>> table;
 
-            }
-        );
+        public DTDLookupTable(bool isXML10)
+        {
+            GenericXMLLookupTable = new(isXML10);
+            table = new(
+                new Dictionary<string, Func<string, bool>>
+                {
+                    { "Nmtoken"             , ReadNameToken                     },
+                    { "Nmtokens"            , ReadNameTokens                    },
+                    { "EntityValue"         , ReadEntityValue                   },
+                    { "DeclSep"             , ReadDeclerationSeperation         },
+                    { "intSubset"           , ReadInternalSubset                },
+                    { "markupdecl"          , ReadMarkupDeclaration             },
+                    { "extSubset"           , ReadExternalSubset                },
+                    { "extSubsetDecl"       , ReadExternalSubsetDecleration     },
+                    { "elementDecl"         , ReadElementDecleration            },
+                    { "contentSpec"         , ReadContentSpecification          },
+                    { "children"            , ReadChildren                      },
+                    { "cp"                  , ReadContentParticles              },
+                    { "choice"              , ReadChoice                        },
+                    { "seq"                 , ReadSequence                      },
+                    { "Mixed"               , ReadMixed                         },
+                    { "AttlistDecl"         , ReadAttributeListDecleration      },
+                    { "AttDef"              , ReadAttributeDefinition           },
+                    { "AttType"             , ReadAttributeType                 },
+                    { "StringType"          , ReadStringType                    },
+                    { "TokenizedType"       , ReadTokenizedType                 },
+                    { "NotationType"        , ReadNotationType                  },
+                    { "EnumerationType"     , ReadEnumerationType               },
+                    { "DefaultDecl"         , ReadDefaultDecleration            },
+                    { "conditionalSect"     , ReadConditionalSection            },
+                    { "includeSect"         , ReadIncludeSection                },
+                    { "ignoreSect"          , ReadIgnoreSection                 },
+                    { "ignoreSectContents"  , ReadIgnoreSectionContents         },
+                    { "Ignore"              , ReadIgnore                        },
+                    { "EntityDecl"          , ReadEntityDecleration             },
+                    { "GEDecl"              , ReadGeneralEntityDecleration      },
+                    { "PEDecl"              , ReadParameterEntityDecleration    },
+                    { "EntityDef"           , ReadEntityDefinition              },
+                    { "PEDef"               , ReadParameterEntityDefinition     },
+                    { "ExternalID"          , ReadExternalID                    },
+                    { "NDataDecl"           , ReadNotationDataDecleration       },
+                    { "TextDecl"            , ReadTextDecleration               },
+                    { "extParsedEnt"        , ReadExternalParsedEntity          },
+                    { "NotationDecl"        , ReadNotationDecleration           },
+                    { "PublicID"            , ReadPublicID                      }
+                }
+            );
+        }
+
+        public Func<string, bool> this[string key] => table[key];
+
+        // (NameChar)+
+        private bool ReadNameToken(string toCheckString) =>
+            AssertMinLength(toCheckString, 1) &&
+            toCheckString.AllString(GenericXMLLookupTable["NameChar"]);
+
+        // Nmtoken (#x20 Nmtoken)*
+        private bool ReadNameTokens(string toCheckString) => 
+            ReadMultipleTokens(toCheckString, ' ', ReadNameToken);
+
+        // '"' ([^%&"] | PEReference | Reference)* '"' |  "'" ([^%&'] | PEReference | Reference)* "'"
+        private bool ReadEntityValue(string toCheckString) => 
+            ReadQuoted(toCheckString, quote => $"[^{quote}]");
+
+        // PEReference | S
+        private bool ReadDeclerationSeperation(string toCheckstring) =>
+            GenericXMLLookupTable["PEReference"](toCheckstring) || GenericXMLLookupTable["S"](toCheckstring);
+
+        // (markupdecl | DeclSep)*
+        private bool ReadInternalSubset(string toCheckString);
+
+        // elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment
+        private bool ReadMarkupDeclaration(string toCheckString);
+
+        // TextDecl? extSubsetDecl
+        private bool ReadExternalSubset(string toCheckString);
+
+        // (markupdecl | conditionalSect | DeclSep)*
+        private bool ReadExternalSubsetDecleration(string toCheckString);
+
+        // '<!ELEMENT' S Name S contentspec S? '>'
+        private bool ReadElementDecleration(string toCheckString) => 
+            ReadDecleration(toCheckString, "ELEMENT", 3, ReadContentSpecification);
+
+        // 'EMPTY' | 'ANY' | Mixed | children
+        private bool ReadContentSpecification(string toCheckString) =>
+            AssertMinLength(toCheckString, 3) &&
+            toCheckString == "EMPTY" || toCheckString == "ANY" || ReadMixed(toCheckString) || ReadChildren(toCheckString);
+
+        // (choice | seq) ('?' | '*' | '+')?
+        private bool ReadChildren(string toCheckString) =>
+            AssertMinLength(toCheckString, 3) &&
+            CheckReference(toCheckString, (str) => ReadChoice(str) || ReadSequence(str),
+                match => match.StartIndex == 0,
+                match => true,
+                out string body) &&
+            ReadOptional(body, 0, (str) => str == "?" || str == "*" || str == "+", out body) &&
+            body == string.Empty;
+
+        // (Name | choice | seq) ('?' | '*' | '+')?
+        private bool ReadContentParticles(string toCheckString)
+        {
+            /*
+             * if string starts with '(' and the last ')' is eather the last or second to last character
+             * read it as a choice or sequence
+             * otherwise read it as name
+             * then read the ('?' | '*' | '+')? if present
+             */
+            ReadOptional(toCheckString, toCheckString.EndIndex,
+               (str) => str == "?" || str == "*" || str == "+", out string expression);
+            int lastIndexOfClosingBracket = expression.LastIndexOf(")");
+            if (expression.StartsWith("(") && (lastIndexOfClosingBracket == expression.EndIndex))
+                // possible improvement would be to first check if it is a choice or sequence and depending on that specificlly do the check to save on time
+                return ReadChoice(expression) || ReadSequence(expression);
+            else
+                return GenericXMLLookupTable["Name"](expression);
+        }
+
+
+        // '(' S? cp ( S? '|' S? cp )+ S? ')'
+        private bool ReadChoice(string toCheckString)
+        {
+            if (!AssertContainedAndUpdate(toCheckString, 5, "(", ")", out string body))
+                return false;
+            ReadOptional(body, 0, GenericXMLLookupTable["S"], out body);
+            
+                
+        }
+
+        // '(' S? cp ( S? ',' S? cp )* S? ')'
+        private bool ReadSequence(string toCheckString);
+
+        // '(' S? '#PCDATA' (S? '|' S? Name)* S? ')*' | '(' S? '#PCDATA' S? ')'
+        private bool ReadMixed(string toCheckString);
+
+        // // '<!<name>' S Name S contentspec S? '>'
+        private bool ReadDecleration(string toCheckString, string name, int minBodyLen, Func<string, bool> bodyCheck) =>
+            AssertContainedAndUpdate(toCheckString, (name.Length + minBodyLen + 6), $"<!{name}", ">", out string body) &&
+            // S
+            CheckReference(body, GenericXMLLookupTable["S"],
+                match => match.StartIndex == 0,
+                match => true,
+                out body) &&
+            // Name
+            CheckReference(body, GenericXMLLookupTable["Name"],
+                match => match.StartIndex == 0,
+                match => true,
+                out body) &&
+            // S
+            CheckReference(body, GenericXMLLookupTable["S"],
+                match => match.StartIndex == 0,
+                match => true,
+                out body) &&
+            // contentspec
+            CheckReference(body, bodyCheck,
+                match => match.StartIndex == 0,
+                match => true,
+                out body) &&
+            body.IsWhiteSpace() &&
+            ReadOptional(body, 0, GenericXMLLookupTable["S"], out body) &&
+            body == string.Empty;
     }
 }

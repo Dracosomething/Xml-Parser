@@ -7,6 +7,8 @@ namespace XmlParser.src
 
     internal delegate bool MatchDelegate(Match match);
 
+    internal delegate bool ReturnExpression(out string str);
+
     internal static class Constants
     {
         // made static since we only need one colorscheme for the entire program.
@@ -152,6 +154,11 @@ namespace XmlParser.src
             public int EndIndex => str.Length - 1;
 
             public string Substring(Range range) => str.Substring(range.StartIndex, range.Length);
+        
+            public bool AllString(Func<string, bool> predicate)
+            {
+                return str.All(c => predicate(c.ToString()));
+            }
         }
     }
 }

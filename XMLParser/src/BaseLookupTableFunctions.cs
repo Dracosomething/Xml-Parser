@@ -25,8 +25,11 @@ namespace XmlParser.src
         protected bool AssertContainedAndUpdate(string text, int minLen, string start, string end, out string updated)
         {
             updated = string.Empty;
-            return AssertContained(text, minLen, start, end) &&
-                (updated = text.Substring(new Range { StartIndex = start.EndIndex, EndIndex = end.EndIndex })) != string.Empty;
+            return ReturnAndInitialze((out toInit) =>
+            {
+                toInit = text.Substring(new Range { StartIndex = start.EndIndex, EndIndex = end.EndIndex });
+                return AssertContained(text, minLen, start, end);
+            }, out updated);
         }
 
         protected bool AssertCharacter(string text) => text.Length == 1;
@@ -35,27 +38,41 @@ namespace XmlParser.src
         {
             updated = string.Empty;
             char quote = text.First();
-            return text.ContainedWithin("'") || text.ContainedWithin('"') || (updated = text.Replace(quote.ToString(), "")) != string.Empty;
+            return ReturnAndInitialze((out toInit) =>
+            {
+                toInit = text.Replace(quote.ToString(), "");
+                return text.ContainedWithin("'") || text.ContainedWithin('"');
+            }, out updated);
         }
 
         protected bool CheckReference(string text, Func<string, bool> func, MatchDelegate notMatch, MatchDelegate shouldMatch, out string update)
         {
             update = string.Empty;
             var match = text.FirstMatch(func);
-            return match.Found && !notMatch(match) && shouldMatch(match) &&
-                (update = text.Remove(match.StartIndex, match.Length)) != string.Empty;
+            return ReturnAndInitialze((out updated) =>
+            {
+                updated = text.Remove(match.StartIndex, match.Length);
+                return match.Found && !notMatch(match) && shouldMatch(match);
+            }, out update);
         }
 
         protected bool ReadOptional(string text, int startPos, Func<string, bool> func, out string updated)
         {
-            updated = string.Empty;
+            updated = text;
             var match = text.FirstMatch(func);
             if (match.Found && match.StartIndex == startPos)
-            {
                 updated = text.Remove(match.StartIndex, match.Length);
-                return true;
-            }
-            return false;
+            return true;
         }
+
+        protected bool ReadMultipleTokens(string toCheckString, char seperator, Func<string, bool> func)
+        {
+            if (!AssertMinLength(toCheckString, 1))
+                return false;
+            string[] items = toCheckString.Split(seperator);
+            return items.Length > 1 && items.All(func);
+        }
+
+        protected bool ReturnAndInitialze(ReturnExpression output, out string toInit) => output(out toInit);
     }
 }

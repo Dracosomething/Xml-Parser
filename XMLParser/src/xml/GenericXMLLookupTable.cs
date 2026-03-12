@@ -117,18 +117,12 @@ namespace XmlParser.src.xml
             AssertMinLength(toCheckString, 1) && (
                 toCheckString.Length > 1 ? (
                     toCheckString.StartsWith(ReadNameStartCharacter) && 
-                    toCheckString.Substring(1).All(c => ReadNameCharacter(c.ToString()))
+                    toCheckString.Substring(1).AllString(ReadNameCharacter)
                 ) : toCheckString.StartsWith(ReadNameStartCharacter)
             );
 
-        private bool ReadNames(string toCheckString)
-        {
-            // Name (#x20 Name)*
-            if (!AssertMinLength(toCheckString, 1))
-                return false;
-            string[] items = toCheckString.Split(' '); // split all the names;
-            return items.Length > 1 && items.All(ReadName);
-        }
+        // Name (#x20 Name)*
+        private bool ReadNames(string toCheckString) => ReadMultipleTokens(toCheckString, ' ', ReadName);
 
         // '"' ([^<&"] | Reference)* '"' | "'" ([^<&'] | Reference)* "'"
         private bool ReadAttributeValue(string toCheckString) => 
@@ -165,18 +159,20 @@ namespace XmlParser.src.xml
             AssertContainedAndUpdate(toCheckString, 6, "<?", "?>", out string body) &&
             // PITarget
             CheckReference(body, ReadName,
-                match => match.StartIndex != 0 || match.Result.ToLower() == "xml",
-                match => match.Length == body.Length, out body) &&
+                match => match.StartIndex != 0 && match.Result.ToLower() == "xml",
+                match => match.Length == body.Length, 
+                out body) &&
             // (S (Char* - (Char* '?>' Char*)))
             CheckReference(body, IsSpace,
-                match => match.StartIndex != 0 || match.EndIndex != body.EndIndex,
-                match => true, out body) &&
+                match => match.StartIndex != 0 && match.EndIndex != body.EndIndex,
+                match => true, 
+                out body) &&
             // (Char* - (Char* '?>' Char*))
-            !body.All(c => ValidateCharacter(c.ToString())) && !body.Contains("?>");
+            !body.AllString(ValidateCharacter) && !body.Contains("?>");
 
         // S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
         private bool ReadVersionInfo(string toCheckString) =>
-            ReadDeclaration(toCheckString, "value", 3, ReadVersionNum);
+            ReadDeclaration(toCheckString, "version", 3, ReadVersionNum);
 
         // S? '=' S?
         private bool ReadEquals(string toCheckString) =>
@@ -202,7 +198,7 @@ namespace XmlParser.src.xml
 
             int semicolonIndex = toCheckString.IndexOf(';');
             string numberAsString = toCheckString.Substring(new Range { StartIndex = 2, EndIndex = semicolonIndex }).Replace("x", "");
-            referenced = (char)((toCheckString.StartsWith("&#x") ? Constants.IntFromHex(numberAsString) : int.Parse(numberAsString)));
+            referenced = (char)((toCheckString.StartsWith("&#x")) ? Constants.IntFromHex(numberAsString) : int.Parse(numberAsString));
 
             return ValidateCharacter(referenced.ToString());
         }
@@ -233,24 +229,26 @@ namespace XmlParser.src.xml
 
         public bool ReadDeclaration(string toCheckString, string name, int valueCheckLen, Func<string, bool> valueCheck)
         {
+            // S <name> Eq ("'" <valueCheck> "'" | '"' <valueCheck> '"')
             const int spaceLen = 1;
             int nameLen = name.Length;
             const int equalsLen = 1;
             const int quoteLen = 1;
             int expectedLen = spaceLen + nameLen + equalsLen + quoteLen + valueCheckLen + quoteLen; // = nameLen + valueCheckLen + 4
-            // S <name> Eq ("'" <valueCheck> "'" | '"' <valueCheck> '"')
-            if (!AssertMinLength(toCheckString, expectedLen)) // string has to be at least (nameLen + valueCheckLen + 4) characters long
-                return false;
-            // S
-            if (!CheckReference(toCheckString, IsSpace,                                     // nameLen + valueCheckLen + 3
-                match => match.StartIndex != 0 || match.Length >= toCheckString.Length - (expectedLen -= spaceLen),
-                match => true, out string leftOver) && !leftOver.StartsWith(name))
+            if (!AssertMinLength(toCheckString, expectedLen) || // string has to be at least (nameLen + valueCheckLen + 4) characters long
+                // S
+                !CheckReference(toCheckString, IsSpace,                                     // nameLen + valueCheckLen + 3
+                match => match.StartIndex != 0 && match.Length >= toCheckString.Length - (expectedLen -= spaceLen),
+                match => true, 
+                out string leftOver) && 
+                !leftOver.StartsWith(name))
                 return false;
             leftOver = leftOver.Remove(0, nameLen);
             // Eq
             if (!CheckReference(leftOver, ReadEquals,                                                    // valueCheckLen + 2
-                match => match.StartIndex != 0 || match.Length >= toCheckString.Length - (expectedLen -= nameLen + equalsLen),
-                match => true, out leftOver))
+                match => match.StartIndex != 0 && match.Length >= toCheckString.Length - (expectedLen -= nameLen + equalsLen),
+                match => true, 
+                out leftOver))
                 return false;
             // ("'" <valueCheck> "'" | '"' <valueCheck> '"')
             if (!AssertQuotedAndUpdate(leftOver, out leftOver))

@@ -24,7 +24,7 @@ namespace XmlParser.src.xml
     /// [43]   content             ::=       CharData? ((element | Reference | CDSect | PI | Comment) CharData?)*
     /// [44]   EmptyElemTag        ::=       '<' Name (S Attribute)* S? '/>'    [WFC: Unique Att Spec]
     /// </summary>
-    internal class XMLLookupTable
+    internal class XMLLookupTable : BaseLookupTableFunctions
     {
         private GenericXMLLookupTable GenericXMLLookupTable;
         private LookupTable<string, Func<string, bool>> table;
@@ -57,43 +57,51 @@ namespace XmlParser.src.xml
         private bool ReadCharacterData(string toCheckString) => 
             Constants.RegexMatch(toCheckString, "[^<&]*") && !toCheckString.Contains("]]>");
 
-        private bool ReadCharacterDataSection(string toCheckString)
-        {
-            // '<![CDATA[' (Char* - (Char* ']]>' Char*)) ']]>'
-            if (!)
-            if (toCheckString.Length < 13)
-                return false;
-            if (!toCheckString.StartsWith("<![CDATA[") && !toCheckString.EndsWith("]]>"))
-                return false;
-
-            int bodyStartIndex = "<![CDATA[".Length - 1;
-            int bodyEndIndex = toCheckString.Length - 1 - 3; // remove 1 cuz length will always be 1 longer then index and remove 3 since "]]>" is 3 characters long
-            int bodyLength = bodyEndIndex - bodyStartIndex;
-
-            string body = toCheckString.Substring(bodyStartIndex, bodyLength);
-            var charExpression = GenericXMLLookupTable["Char"];
-            return body.All(c => charExpression(c.ToString())) && !body.Contains("]]>");
-        }
+        // '<![CDATA[' (Char* - (Char* ']]>' Char*)) ']]>'
+        private bool ReadCharacterDataSection(string toCheckString) =>
+            AssertContainedAndUpdate(toCheckString, 13, "<![CDATA[", "]]>", out string body) &&
+            (body.AllString(GenericXMLLookupTable["Char"]) && !body.Contains("]]>"));
 
         private bool ReadProlog(string toCheckString)
         {
             // XMLDecl? Misc* (doctypedecl Misc*)?
         }
 
-        private bool ReadXMLDeclreration(string toCheckString)
+        // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
+        private bool ReadXMLDeclreration(string toCheckString) =>
+            // min length = '<?xml'.Length + VersionInfo->minLength + '?>'.Length = 5 + 14 + 2 = 21
+            AssertContainedAndUpdate(toCheckString, 21, "<?xml", "?>", out string body) &&
+            // VersionInfo
+            CheckReference(body, GenericXMLLookupTable["VersionInfo"],
+                match => match.StartIndex == 0 && match.Length >= 14,
+                match => true,
+                out body) &&
+            // EncodingDecl?
+            ReadOptional(body, 0, GenericXMLLookupTable["EncodingDecl"], out body) &&
+            // SDDecl?
+            ReadOptional(body, 0, ReadstandaloneDocumentDecleration, out body) &&
+            // S?
+            ReadOptional(body, 0, GenericXMLLookupTable["S"], out body) &&
+            body == string.Empty; // string must be empty after this.
+
+        // '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>'
+        private bool ReadDocumentTypeDecleration(string toCheckString)
         {
-            // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
-            if (!toCheckString.StartsWith("<?xml") || !toCheckString.EndsWith("?>"))
+            if (!AssertContainedAndUpdate(toCheckString, 12, "<!DOCTYPE", ">", out string body) ||
+                !CheckReference(body, GenericXMLLookupTable["S"],
+                match => match.StartIndex == 0,
+                match => true,
+                out body) ||
+                !CheckReference(body, GenericXMLLookupTable["Name"],
+                match => match.StartIndex == 0,
+                match => true,
+                out body))
                 return false;
-
-            int bodyStartIndex = "<?xml".Length - 1;
-            int bodyEndIndex = toCheckString.Length - 1 - 2; // remove 1 cuz the length is always 1 longer then the index and remove 2 cuz "?>".Length is 2 
-            int bodyLength = bodyEndIndex - bodyStartIndex;
-
-            string leftover = toCheckString.Substring(bodyStartIndex, bodyLength);
-            var versionInfoExpression = GenericXMLLookupTable["VersionInfo"];
-            var match = leftover.FirstMatch(versionInfoExpression);
-            
+            if (ReadOptional(body, 0, ))
         }
+
+        // S 'standalone' Eq (("'" ('yes' | 'no') "'") | ('"' ('yes' | 'no') '"'))
+        private bool ReadstandaloneDocumentDecleration(string toCheckString) =>
+            GenericXMLLookupTable.ReadDeclaration(toCheckString, "standalone", 2, (str) => str == "yes" || str == "no");
     }
 }
