@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml;
-using XmlParser.src;
+﻿using XmlParser.src.extentions;
+using XMLParser.src.xml;
 
 namespace XmlParser.src.xml
 {
@@ -17,83 +10,45 @@ namespace XmlParser.src.xml
 
     public class XMLParser
     {
-        private FileInfo XMLFile;
-        private StringBuilder content;
-        private int xmlDecLen = 5;
-        private int singleCharLen = 1;
-        private int versionLen = 7;
-        private int equalsLen = 3;
-        private IList<string> quotations = new List<string> { "'", "\"" };
-        
+        private readonly FileInfo file;
+        private GenericXMLLookupTable genericTable = new(true);
+        private XMLLookupTable table = new(true);
 
-        public string Content { get { return content.ToString(); } }
-
-        public XMLParser(string filepath)
+        public XMLParser(string path)
         {
-            XMLFile = new FileInfo(filepath);
-            if (XMLFile.Extension != ".xml")
-                throw new XMLFileException(XMLFile);
-            content = new StringBuilder();
-            Parse();
+            file = new(path);
         }
 
-        private Exception Parse()
+        public XMLParser(FileInfo info)
         {
-            // ignore: "<!--"
-            try
-            {
-                var reader = new FileReader(XMLFile);
-                int flag = 0;
-                XMLMetaData metaData = new XMLMetaData();
-                
-                while (!reader.EndOfFile())
-                {
-                    for (;;)
-                    {
-
-                    }
-                }
-            } catch(Exception e) { return e; }
-            return null;
+            file = info;
         }
 
-        private Pair<string, string> ReadProperty(FileReader reader)
+        public void Parse()
         {
-            Pair<string, string> result;
-            
-
-            string key = "";
-            string current;
-            string tmp;
-            while (true)
+            string text = PreProcess(Normalize(File.ReadAllText(file.FullName)));
+            var readXmlDeclaration = table["XMLDecl"];
+            if (readXmlDeclaration != null && text.StartsWith((Func<string, bool>)readXmlDeclaration))
             {
-                tmp = reader.Peak(3);
-                
-                current = reader.Read();
-                key += current;
+                var reader = new FileReader(text);
+                string xmlDeclaration = reader.Read(readXmlDeclaration);
+
             }
+        }
 
+        private string Normalize(string text)
+        {
+            return Utils.RegexReplace(text.Replace("\r\n", "\n"), "\n", @"\r(?!\n)");
+        }
 
+        private string PreProcess(string text)
+        {
+            return text.Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").Replace("&apos;", "'").Replace("&quot;", "\"");
+        }
 
-            if (reader.Peak() != "\"" || reader.Peak() != "'")
-                throw new Exception("Xml property seems to be malformed.");
-            reader.Skip();
-            string value = "";
-            // we do an infinite loop here to make it easier when breaking out of it
-            while(true)
-            {
-                current = reader.Read();
-                if (quotations.Contains(current))
-                    break;
-                value += current;
-            }
-
-            result = new Pair<string, string>
-            {
-                Key = key,
-                Value = value
-            };
-            return result;
+        private XMLMetaData ParseXMLDecleration(string decleration)
+        {
+            throw new NotImplementedException();
         }
     }
 }

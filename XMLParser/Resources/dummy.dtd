@@ -1,7 +1,7 @@
 <!-- comment test -->
 <!ENTITY % html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!ENTITY % other SYSTEM "other.dtd">
-<!ENTITY testEntity "example">
+<!ENTITY testEntity "example ewew">
 %html;
 %other;
 <!NOTATION gif PUBLIC "GIF 1.0">
@@ -15,11 +15,11 @@
 <!ELEMENT b EMPTY>
 <!ELEMENT c ANY>
 <!ELEMENT h ANY>
-<!ELEMENT d (#PCDATA, h)>
+<!ELEMENT d (#PCDATA| h)*>
 <!ELEMENT test (a, b+, c?)>
 <!ELEMENT testOpt (a | b | (c?, d*))>
 <!ATTLIST a test CDATA #IMPLIED testr ID #REQUIRED testf CDATA #FIXED '1.5'>
 <!ATTLIST b entTest ENTITY #REQUIRED entsTest ENTITIES #REQUIRED>
 <!ATTLIST c test IDREF #REQUIRED test2 IDREFS #REQUIRED>
 <!ATTLIST d test NMTOKEN #REQUIRED test2 NMTOKENS #REQUIRED>
-<!ATTLIST test NOTATION (gif|jpg|png) #REQUIRED>
+<!ATTLIST test type NOTATION (gif|jpg|png) #REQUIRED>

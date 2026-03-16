@@ -1,29 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace XmlParser.src.xml
+namespace XMLParser.src.xml
 {
-    internal enum ExternalId
+    enum XMLVersion
     {
-        SYSTEM,
-        PUBLIC
+        XML10,
+        XML11
     }
 
-    internal struct XMLMetaData
+    internal class XMLMetaData
     {
-        public string version;
-        public Encoding encoding;
-        public bool standalone;
-
-        public string doctypeName;
-        public ExternalId externalID;
-        public string fileName;
-        public string publicIdentifier;
-        public Uri systemIdentifier;
-
-        
+        public required XMLVersion Version { get; init; }
+        public Encoding Encoding { get; init; } = Encoding.UTF8;
+        public bool Standalone { get; init; } = true;
     }
 }

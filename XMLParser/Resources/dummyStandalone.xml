@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml-stylesheet type="text/xsl" href="main.xsl"?>
+<!-- test comment -->
+<greeting authur="John"
+		  date=  "16/03/2026 16:48"		
+		  >
+	<text xml:space="preserve">
+		<![CDATA[<example cdata woaw>]]> and more normal text
+		even whitespaces, genues text.
+		&lt;text&gt;
+	</text>
+	<to xml:lang="en">Elvis</to>
+</greeting>

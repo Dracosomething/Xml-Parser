@@ -58,7 +58,8 @@ namespace XmlParser.src.xml
             AssertContainedAndUpdate(toCheckString, 13, "<![CDATA[", "]]>", out string body) &&
             (body.AllString(GenericXMLLookupTable["Char"]) && !body.Contains("]]>"));
 
-        // XMLDecl? Misc*
+        // XMLDecl? Misc* (doctypedecl Misc*)?
+        // the (doctypedecl Misc*)? has not been implemented yet
         private bool ReadProlog(string toCheckString) =>
             ReadOptional(toCheckString, 0, ReadXMLDeclreration, out string extra) &&
             (extra == string.Empty || extra.AllString(GenericXMLLookupTable["Misc"]));
