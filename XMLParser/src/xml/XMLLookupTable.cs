@@ -1,4 +1,7 @@
-﻿namespace XmlParser.src.xml
+﻿using XmlParser.src.extentions;
+using XMLParser.src;
+
+namespace XmlParser.src.xml
 {
     /// <summary>
     /// Lookup table for every xml related expresion
@@ -33,7 +36,6 @@
                     { "CDSect"          , ReadCharacterDataSection          },
                     { "prolog"          , ReadProlog                        },
                     { "XMLDecleration"  , ReadXMLDeclreration               },
-                    { "doctypedecl"     , ReadDocumentTypeDecleration       },
                     { "SDDecl"          , ReadstandaloneDocumentDecleration },
                     { "element"         , ReadElement                       },
                     { "STag"            , ReadStartTag                      },
@@ -56,10 +58,10 @@
             AssertContainedAndUpdate(toCheckString, 13, "<![CDATA[", "]]>", out string body) &&
             (body.AllString(GenericXMLLookupTable["Char"]) && !body.Contains("]]>"));
 
-        private bool ReadProlog(string toCheckString)
-        {
-            // XMLDecl? Misc* (doctypedecl Misc*)?
-        }
+        // XMLDecl? Misc*
+        private bool ReadProlog(string toCheckString) =>
+            ReadOptional(toCheckString, 0, ReadXMLDeclreration, out string extra) &&
+            (extra == string.Empty || extra.AllString(GenericXMLLookupTable["Misc"]));
 
         // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
         private bool ReadXMLDeclreration(string toCheckString) =>
@@ -78,24 +80,101 @@
             ReadOptional(body, 0, GenericXMLLookupTable["S"], out body) &&
             body == string.Empty; // string must be empty after this.
 
-        // '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>'
-        private bool ReadDocumentTypeDecleration(string toCheckString)
-        {
-            if (!AssertContainedAndUpdate(toCheckString, 12, "<!DOCTYPE", ">", out string body) ||
-                !CheckReference(body, GenericXMLLookupTable["S"],
-                match => match.StartIndex == 0,
-                match => true,
-                out body) ||
-                !CheckReference(body, GenericXMLLookupTable["Name"],
-                match => match.StartIndex == 0,
-                match => true,
-                out body))
-                return false;
-            if (ReadOptional(body, 0, ))
-        }
-
         // S 'standalone' Eq (("'" ('yes' | 'no') "'") | ('"' ('yes' | 'no') '"'))
         private bool ReadstandaloneDocumentDecleration(string toCheckString) =>
             GenericXMLLookupTable.ReadDeclaration(toCheckString, "standalone", 2, (str) => str == "yes" || str == "no");
+
+        // EmptyElemTag | STag content ETag 
+        private bool ReadElement(string toCheckString) =>
+            ReadEmptyElementTag(toCheckString) ||
+                (CheckReference(toCheckString, ReadStartTag, 4, out toCheckString) &&
+                 CheckReference(toCheckString, ReadContent, 3, out toCheckString) &&
+                 CheckReference(toCheckString, ReadEndTag, 4, out toCheckString));
+
+        // '<' Name (S Attribute)* S? '>'
+        private bool ReadStartTag(string toCheckString) =>
+            ReadTag(toCheckString, ">");
+
+        // Name Eq AttValue
+        private bool ReadAttribute(string toCheckString) =>
+            AssertMinLength(toCheckString, 4) &&
+            CheckAllRefernces(toCheckString, [
+                GenericXMLLookupTable["Name"],
+                GenericXMLLookupTable["Eq"],
+                GenericXMLLookupTable["AttValye"]
+            ], [1, 1, 2], out toCheckString) &&
+            toCheckString == string.Empty;
+
+        // '</' Name S? '>'
+        private bool ReadEndTag(string toCheckString) =>
+            AssertContainedAndUpdate(toCheckString, 4, "</", ">", out string data) &&
+            CheckReference(data, GenericXMLLookupTable["Name"], 1, out data) &&
+            ReadOptional(data, 0, GenericXMLLookupTable["S"], out data) &&
+            data == string.Empty;
+
+        // CharData? ((element | Reference | CDSect | PI | Comment) CharData?)*
+        private bool ReadContent(string toCheckString)
+        {
+            if (!AssertMinLength(toCheckString, 3))
+                return false;
+            ReadOptional(toCheckString, 0, ReadCharacterData, out string body);
+            // ((element | Reference | CDSect | PI | Comment) CharData?)*
+            // (element | Reference | CDSect | PI | Comment)
+            // this is the group
+            for (int i = 0; i < body.Length; i++)
+            {
+                char c = body[i];
+                if (c == '<' && (body[i + 1] != '-' || body[i + 1] != '!'))
+                {
+                    // its an element
+                    // read and update
+                    if (!CheckReference(body, ReadElement, 4, out body))
+                        return false;
+                }
+                else
+                {
+                    Func<string, bool> func = (str) =>
+                        GenericXMLLookupTable["Reference"](str) ||
+                        ReadCharacterDataSection(str) ||
+                        GenericXMLLookupTable["PI"](str) ||
+                        GenericXMLLookupTable["Comment"](str);
+                    if (!CheckReference(body, func, 3, out body))
+                        return false;
+                }
+                ReadOptional(toCheckString, 0, ReadCharacterData, out body);
+            }
+            return true;
+        }
+
+        // this one was a bitch to implement
+        // '<' Name (S Attribute)* S? '/>'
+        private bool ReadEmptyElementTag(string toCheckString) =>
+            ReadTag(toCheckString, "/>");
+
+        private bool ReadTag(string toCheckString, string close)
+        {
+            if (!AssertContainedAndUpdate(toCheckString, 4, "<", close, out string body))
+                return false;
+            if (!CheckReference(body, GenericXMLLookupTable["Name"], match => match.StartIndex != 0,
+                match => true,
+                out body))
+                return false;
+            // read space and check if there is still space left in the string
+            ReadOptional(body, 0, GenericXMLLookupTable["S"], out string tmp);
+            if (tmp == string.Empty)
+                return true;
+            // first remove the trailing space
+            // then we can maybe loop while the string is not empty
+            // if something is not true
+            // return false
+            // otherwise return true
+            body = body.TrimEnd(Constants.whiteSpace);
+            while (body != string.Empty)
+            {
+                if (!CheckAllRefernces(body, [GenericXMLLookupTable["S"], ReadAttribute], [1, 1], out body))
+                    return false;
+            }
+            return toCheckString.EndsWith(GenericXMLLookupTable["S"]);
+        }
     }
 }

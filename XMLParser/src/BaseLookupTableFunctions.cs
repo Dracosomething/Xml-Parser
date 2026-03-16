@@ -56,6 +56,32 @@ namespace XmlParser.src
             }, out update);
         }
 
+        protected bool CheckReference(string text, Func<string, bool> func, int minlength, out string updated)
+        {
+            return CheckReference(text, func,
+                match => match.StartIndex != 0,
+                match => match.Length > minlength,
+                out updated);
+        }
+
+        protected bool CheckAllRefernces(string text, Func<string, bool>[] funcs, int[] minlengths, out string updated)
+        {
+            int i = 0;
+            updated = text;
+            foreach (var func in funcs)
+            {
+                if (!CheckReference(text, func,
+                match => match.StartIndex != 0,
+                match => match.Length > minlengths[i++],
+                out updated))
+                {
+                    updated = text;
+                    return false;
+                }
+            }
+            return true;
+        }
+
         protected bool ReadOptional(string text, int startPos, Func<string, bool> func, out string updated)
         {
             updated = text;
@@ -71,21 +97,6 @@ namespace XmlParser.src
                 return false;
             string[] items = toCheckString.Split(seperator);
             return items.Length > 1 && items.All(func);
-        }
-
-        protected bool CheckAllRefernces(string text, Func<string, bool>[] funcs, int[] minlengths, out string updated)
-        {
-            int i = 0;
-            updated = text;
-            foreach (var func in funcs)
-            {
-                if (!CheckReference(text, func,
-                match => match.StartIndex != 0,
-                match => match.Length > minlengths[i++],
-                out updated))
-                    return false;
-            }
-            return true;
         }
 
         protected bool ReturnAndInitialze(ReturnExpression output, out string toInit) => output(out toInit);
