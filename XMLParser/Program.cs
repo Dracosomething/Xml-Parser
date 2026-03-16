@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using XmlParser.src;
-using XmlParser.src.gui;
+﻿using XmlParser.src.gui;
 
 namespace XmlParser
 {
@@ -24,14 +17,24 @@ namespace XmlParser
             // step 1.3: get root element
             // step 2: run pre prossesor over xml file
             // step 3: parse xml file
-            string input = "((a,  b)|  c| werd|(o,b , ( o| p)) )";
-            var matches = Regex.Matches(input, @"(?<=\()\((?>[^()]+|\((?<Depth>)|\)(?<-Depth>))*(?(Depth)(?!))\)");
-            foreach(System.Text.RegularExpressions.Match match in matches)
-            {
-                Console.WriteLine(match.Value);
-            }
 
+            // special attribute: xml:space
+            // when declared must be an enumeration type that can only hold the values of "default" or "preserve"
+            // anything else throws an error
+            // "default" means the parsers default whitespace handling behaviour aka ignore whitespace
+            // "preserve" means preseerving whitespace
+            // value applies to all nested xml elements
+            // default value should be specified by the element declaration
 
+            // prosessor must normalize all instances of "#xD #xA" and any "#xD" not followed by "#xA" to a single "#xA"
+
+            // special attribute: xml:lang
+            // must be declared if it's used
+            // value must be a language identifier as defined in https://datatracker.ietf.org/doc/html/rfc4646 and https://datatracker.ietf.org/doc/html/rfc4647
+            // type must be character data
+
+            // implement namespaces later on
+            // defined in https://www.w3.org/TR/xml-names/
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

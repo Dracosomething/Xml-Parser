@@ -1,3 +1,6 @@
-<?xml version='1.9' encoding="utf-8" standalone="no">
+<?xml version='1.0' encoding="utf-8" standalone="no"?>
 <!DOCTYPE test SYSTEM "dummy.dtd">
-<test></test>
+<test type="gif">
+	<a testr="a1b"/>
+	<b entsTest="testEntity" entTest="testEntity"/>
+</test>
