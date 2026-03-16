@@ -62,20 +62,20 @@ namespace XmlParser.src.gui
         {
             if (e.Button == MouseButtons.Left)
             {
-                Constants.colorScheme.ChangeDarkMode();
-                main.BackColor = Constants.colorScheme.Primary;
-                this.BackColor = Constants.colorScheme.Secondary;
-                this.file.ForeColor = Constants.colorScheme.Text;
-                this.file.BackColor = Constants.colorScheme.Secondary;
-                this.settings.ForeColor = Constants.colorScheme.Text;
-                this.settings.BackColor = Constants.colorScheme.Secondary;
-                this.fileContent.ForeColor = Constants.colorScheme.Text;
-                this.fileContent.BackColor = Constants.colorScheme.Primary;
+                Utils.colorScheme.ChangeDarkMode();
+                main.BackColor = Utils.colorScheme.Primary;
+                this.BackColor = Utils.colorScheme.Secondary;
+                this.file.ForeColor = Utils.colorScheme.Text;
+                this.file.BackColor = Utils.colorScheme.Secondary;
+                this.settings.ForeColor = Utils.colorScheme.Text;
+                this.settings.BackColor = Utils.colorScheme.Secondary;
+                this.fileContent.ForeColor = Utils.colorScheme.Text;
+                this.fileContent.BackColor = Utils.colorScheme.Primary;
                 var items = new List<ToolStripMenuItem> { openFile, exit, darkMode };
                 foreach (ToolStripMenuItem item in items)
                 {
-                    item.BackColor = Constants.colorScheme.Accent;
-                    item.ForeColor = Constants.colorScheme.Text;
+                    item.BackColor = Utils.colorScheme.Accent;
+                    item.ForeColor = Utils.colorScheme.Text;
                 }
             }
         }

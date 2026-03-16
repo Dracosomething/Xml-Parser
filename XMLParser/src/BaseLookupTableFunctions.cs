@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using XmlParser.src.extentions;
 
 namespace XmlParser.src
 {
@@ -14,10 +12,12 @@ namespace XmlParser.src
                 return false;
             char quote = quoted.First();
             string unquoted = quoted.Substring(new Range { StartIndex = 1, EndIndex = quoted.EndIndex - 1 });
-            return Constants.RegexMatch(unquoted, supplier(quote));
+            return Utils.RegexMatch(unquoted, supplier(quote));
         }
 
         protected bool AssertMinLength(string text, int minLen) => text.Length > minLen;
+
+        protected bool AssertMinLength(Array arr, int minLen) => arr.Length > minLen;
 
         protected bool AssertContained(string text, int minLen, string start, string end) =>
             AssertMinLength(text, minLen) && text.ContainedWithin(start, end);
@@ -71,6 +71,21 @@ namespace XmlParser.src
                 return false;
             string[] items = toCheckString.Split(seperator);
             return items.Length > 1 && items.All(func);
+        }
+
+        protected bool CheckAllRefernces(string text, Func<string, bool>[] funcs, int[] minlengths, out string updated)
+        {
+            int i = 0;
+            updated = text;
+            foreach (var func in funcs)
+            {
+                if (!CheckReference(text, func,
+                match => match.StartIndex != 0,
+                match => match.Length > minlengths[i++],
+                out updated))
+                    return false;
+            }
+            return true;
         }
 
         protected bool ReturnAndInitialze(ReturnExpression output, out string toInit) => output(out toInit);

@@ -43,8 +43,8 @@ namespace XmlParser.src.gui
             this.Content.ReadOnly = true;
             this.Content.Location = new Point(0, this.menuBar.ClientSize.Height - this.menuBarMarginSize);
             this.Content.ClientSize = new Size(width - this.scrollbarWidth, height - this.menuBar.ClientSize.Height + this.menuBarMarginSize);
-            this.Content.ForeColor = Constants.colorScheme.Text;
-            this.Content.BackColor = Constants.colorScheme.Primary;
+            this.Content.ForeColor = Utils.colorScheme.Text;
+            this.Content.BackColor = Utils.colorScheme.Primary;
             this.Content.BorderStyle = BorderStyle.None;
             this.Content.ScrollBars = ScrollBars.Both;
             //this.Content.
@@ -57,7 +57,7 @@ namespace XmlParser.src.gui
             this.ClientSize = new Size(width, height);
             this.Name = "MainWindow";
             this.Text = "xml parser";
-            this.BackColor = Constants.colorScheme.Primary;
+            this.BackColor = Utils.colorScheme.Primary;
             this.SizeChanged += new EventHandler(this.onResize);
             this.ResumeLayout(false);
             this.PerformLayout();

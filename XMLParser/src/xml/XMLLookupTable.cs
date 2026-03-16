@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XmlParser.src;
-using XmlParser.src.xml;
-
-namespace XmlParser.src.xml
+﻿namespace XmlParser.src.xml
 {
     /// <summary>
     /// Lookup table for every xml related expresion
@@ -33,7 +27,7 @@ namespace XmlParser.src.xml
         {
             GenericXMLLookupTable = new(isXML10);
             table = new(
-                new Dictionary<string, Func<string, bool>> 
+                new Dictionary<string, Func<string, bool>>
                 {
                     { "CharData"        , ReadCharacterData                 },
                     { "CDSect"          , ReadCharacterDataSection          },
@@ -54,8 +48,8 @@ namespace XmlParser.src.xml
         public Func<string, bool> this[string str] => table[str];
 
         //[^<&]* - ([^<&]* ']]>' [^<&]*)
-        private bool ReadCharacterData(string toCheckString) => 
-            Constants.RegexMatch(toCheckString, "[^<&]*") && !toCheckString.Contains("]]>");
+        private bool ReadCharacterData(string toCheckString) =>
+            Utils.RegexMatch(toCheckString, "[^<&]*") && !toCheckString.Contains("]]>");
 
         // '<![CDATA[' (Char* - (Char* ']]>' Char*)) ']]>'
         private bool ReadCharacterDataSection(string toCheckString) =>

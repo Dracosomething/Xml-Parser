@@ -28,7 +28,7 @@ namespace XmlParser.src.xml.dtd
 
         public DTDParser(string filepath)
         {
-            this.filepath = Constants.RegexExtract(filepath, Constants.filePath);
+            this.filepath = Utils.RegexExtract(filepath, Utils.filePath);
             DTDContents = File.ReadAllText(filepath);
             schema = new DTDSchema();
             Parse();
@@ -36,9 +36,9 @@ namespace XmlParser.src.xml.dtd
 
         public DTDParser(Uri external)
         {
-            this.DTDContents = Task.Run(() => Constants.httpClient.GetStringAsync(external)).Result;
+            this.DTDContents = Task.Run(() => Utils.httpClient.GetStringAsync(external)).Result;
             schema = new DTDSchema();
-            this.filepath = Constants.RegexExtract(external.OriginalString, $"{Constants.domain}{Constants.filePath.Replace("^", "")}");
+            this.filepath = Utils.RegexExtract(external.OriginalString, $"{Utils.domain}{Utils.filePath.Replace("^", "")}");
             Parse();
         }
 

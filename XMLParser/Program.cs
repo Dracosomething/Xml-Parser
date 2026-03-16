@@ -24,6 +24,14 @@ namespace XmlParser
             // step 1.3: get root element
             // step 2: run pre prossesor over xml file
             // step 3: parse xml file
+            string input = "((a,  b)|  c| werd|(o,b , ( o| p)) )";
+            var matches = Regex.Matches(input, @"(?<=\()\((?>[^()]+|\((?<Depth>)|\)(?<-Depth>))*(?(Depth)(?!))\)");
+            foreach(System.Text.RegularExpressions.Match match in matches)
+            {
+                Console.WriteLine(match.Value);
+            }
+
+
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
