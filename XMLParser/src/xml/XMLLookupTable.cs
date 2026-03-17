@@ -32,22 +32,22 @@ namespace XmlParser.src.xml
             table = new(
                 new Dictionary<string, Func<string, bool>>
                 {
-                    { "CharData"        , ReadCharacterData                 },
-                    { "CDSect"          , ReadCharacterDataSection          },
+                    { "chardata"        , ReadCharacterData                 },
+                    { "cdsect"          , ReadCharacterDataSection          },
                     { "prolog"          , ReadProlog                        },
-                    { "XMLDecleration"  , ReadXMLDeclreration               },
-                    { "SDDecl"          , ReadstandaloneDocumentDecleration },
+                    { "xmldecleration"  , ReadXMLDeclreration               },
+                    { "sddecl"          , ReadstandaloneDocumentDecleration },
                     { "element"         , ReadElement                       },
-                    { "STag"            , ReadStartTag                      },
-                    { "Attribute"       , ReadAttribute                     },
-                    { "ETag"            , ReadEndTag                        },
+                    { "stag"            , ReadStartTag                      },
+                    { "attribute"       , ReadAttribute                     },
+                    { "etag"            , ReadEndTag                        },
                     { "content"         , ReadContent                       },
-                    { "EmptyElemTag"    , ReadEmptyElementTag               }
+                    { "emptyelemtag"    , ReadEmptyElementTag               }
                 }
             );
         }
 
-        public Func<string, bool> this[string str] => table[str];
+        public Func<string, bool> this[string str] => table[str.ToLower()];
 
         //[^<&]* - ([^<&]* ']]>' [^<&]*)
         private bool ReadCharacterData(string toCheckString) =>

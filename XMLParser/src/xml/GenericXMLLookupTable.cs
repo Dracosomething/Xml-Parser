@@ -41,33 +41,33 @@
             table = new(
                 new Dictionary<string, Func<string, bool>>()
                 {
-                    { "Char"            , ValidateCharacter                 },
-                    { "Space"           , IsSpace                           },
-                    { "RestrictedChar"  , IsRestrictedCharacter             },
-                    { "NameStartChar"   , ReadNameStartCharacter            },
-                    { "NameChar"        , ReadNameCharacter                 },
-                    { "Name"            , ReadName                          },
-                    { "Names"           , ReadNames                         },
-                    { "AttValue"        , ReadAttributeValue                },
-                    { "SystemLiteral"   , ReadSystemLiteral                 },
-                    { "PubidLiteral"    , ReadPubidLiteral                  },
-                    { "Comment"         , ReadComment                       },
-                    { "PI"              , ReadProcessingInstruction         },
-                    { "VersionInfo"     , ReadVersionInfo                   },
-                    { "Eq"              , ReadEquals                        },
-                    { "VersionNum"      , ReadVersionNum                    },
-                    { "Misc"            , ReadMisc                          },
-                    { "CharRef"         , ReadCharacterReference            },
-                    { "Reference"       , ReadReference                     },
-                    { "EntityRef"       , ReadEntityReference               },
-                    { "PEReference"     , ReadParsedEntityReference         },
-                    { "EncodingDecl"    , ReadEncodingDecleration           },
-                    { "EncName"         , ReadEncodingName                  },
+                    { "char"            , ValidateCharacter                 },
+                    { "space"           , IsSpace                           },
+                    { "restrictedchar"  , IsRestrictedCharacter             },
+                    { "namestartchar"   , ReadNameStartCharacter            },
+                    { "namechar"        , ReadNameCharacter                 },
+                    { "name"            , ReadName                          },
+                    { "names"           , ReadNames                         },
+                    { "attvalue"        , ReadAttributeValue                },
+                    { "systemliteral"   , ReadSystemLiteral                 },
+                    { "pubidliteral"    , ReadPubidLiteral                  },
+                    { "comment"         , ReadComment                       },
+                    { "pi"              , ReadProcessingInstruction         },
+                    { "versioninfo"     , ReadVersionInfo                   },
+                    { "eq"              , ReadEquals                        },
+                    { "versionnum"      , ReadVersionNum                    },
+                    { "misc"            , ReadMisc                          },
+                    { "charref"         , ReadCharacterReference            },
+                    { "reference"       , ReadReference                     },
+                    { "entityref"       , ReadEntityReference               },
+                    { "pereference"     , ReadParsedEntityReference         },
+                    { "encodingdecl"    , ReadEncodingDecleration           },
+                    { "encname"         , ReadEncodingName                  },
                 }
            );
             this.isXML10 = isXML10;
         }
 
-        public Func<string, bool> this[string str] => table[str];
+        public Func<string, bool> this[string str] => table[str.ToLower()];
     }
 }

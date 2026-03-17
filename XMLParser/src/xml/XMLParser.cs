@@ -27,28 +27,19 @@ namespace XmlParser.src.xml
         public void Parse()
         {
             string text = PreProcess(Normalize(File.ReadAllText(file.FullName)));
-            var readXmlDeclaration = table["XMLDecl"];
-            if (readXmlDeclaration != null && text.StartsWith((Func<string, bool>)readXmlDeclaration))
-            {
-                var reader = new FileReader(text);
-                string xmlDeclaration = reader.Read(readXmlDeclaration);
-
-            }
+            var readProlog = table["prolog"];
+            var readXmlDecleration = table["XMLDecl"];
+            if ()
         }
 
-        private string Normalize(string text)
-        {
-            return Utils.RegexReplace(text.Replace("\r\n", "\n"), "\n", @"\r(?!\n)");
-        }
+        private string Normalize(string text) => Utils.RegexReplace(text.Replace("\r\n", "\n"), "\n", @"\r(?!\n)");
 
-        private string PreProcess(string text)
-        {
-            return text.Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").Replace("&apos;", "'").Replace("&quot;", "\"");
-        }
+        private string PreProcess(string text) =>
+            text.Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").Replace("&apos;", "'").Replace("&quot;", "\"");
 
-        private XMLMetaData ParseXMLDecleration(string decleration)
+        private XMLMetaData ParseProlog(string prolog)
         {
-            throw new NotImplementedException();
+            if (!prolog.s)
         }
     }
 }

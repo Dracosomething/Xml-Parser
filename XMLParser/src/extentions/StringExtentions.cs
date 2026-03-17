@@ -84,6 +84,19 @@
             {
                 return str.All(c => predicate(c.ToString()));
             }
+
+            public string Replace(Func<string, bool> old, string _new)
+            {
+                string retVal = str;
+                while (true)
+                {
+                    var match = retVal.FirstMatch(old);
+                    if (!match.Found)
+                        break;
+                    retVal = retVal.Remove(match.StartIndex, match.Length);
+                }
+                return retVal;
+            }
         }
     }
 }
