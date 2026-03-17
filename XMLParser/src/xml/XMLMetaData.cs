@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace XMLParser.src.xml
+namespace XmlParser.src.xml
 {
     enum XMLVersion
     {

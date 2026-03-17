@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace XMLParser.src.xml
+namespace XmlParser.src.xml
 {
     enum WhiteSpaceHandling
     {

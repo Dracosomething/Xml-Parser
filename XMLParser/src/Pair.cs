@@ -19,6 +19,6 @@ namespace XmlParser.src.xml
             .ToString();
 
         public static implicit operator Pair<K, V>(KeyValuePair<K, V> pair) => new Pair<K, V> { Key = pair.Key, Value = pair.Value };
-        public static implicit operator KeyValuePair<K, V>(Pair<K, V> pair) => new KeyValuePair<K, V>(pair.Key, pair.Value!);
+        public static implicit operator KeyValuePair<K, V>(Pair<K, V> pair) => new KeyValuePair<K, V>(pair.Key!, pair.Value!);
     }
 }

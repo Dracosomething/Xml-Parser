@@ -1,11 +1,9 @@
-﻿namespace XmlParser.src.extentions
+﻿namespace XmlParser.src.extentions.@string
 {
-    internal static class StringExtentions
+    internal static partial class StringExtentions
     {
         extension(string str)
         {
-            public int EndIndex => str.Length - 1;
-
             /// <summary>
             /// Core of our system
             /// </summary>
@@ -47,14 +45,6 @@
                 return match.Result;
             }
 
-            public bool ContainedWithin(char c) => str.StartsWith(c) && str.EndsWith(c);
-
-            public bool ContainedWithin(string _string) => str.StartsWith(_string) && str.EndsWith(_string);
-
-            public bool ContainedWithin(char start, char end) => str.StartsWith(start) && str.EndsWith(end);
-
-            public bool ContainedWithin(string start, string end) => str.StartsWith(start) && str.EndsWith(end);
-
             public bool Contains(Func<string, bool> func)
             {
                 for (int i = 0; i < str.Length; i++)
@@ -77,8 +67,6 @@
                 var match = str.FirstMatch(func);
                 return match.Found && match.EndIndex == str.Length - 1;
             }
-
-            public string Substring(Range range) => str.Substring(range.StartIndex, range.Length);
 
             public bool AllString(Func<string, bool> predicate)
             {

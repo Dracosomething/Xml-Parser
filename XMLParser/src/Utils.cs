@@ -2,12 +2,6 @@
 
 namespace XmlParser.src
 {
-    internal delegate string FormatSupplier(char quote);
-
-    internal delegate bool MatchDelegate(Match match);
-
-    internal delegate bool ReturnExpression(out string str);
-
     internal static class Utils
     {
         public static string RegexReplace(string value, string replacement, string regex)
@@ -65,5 +59,6 @@ namespace XmlParser.src
             return result;
         }
 
+        public static string GeneralizedKeyNotFoundMessage(string key) => $"Could not find {key}: XMLDecl in LookupTable.";
     }
 }

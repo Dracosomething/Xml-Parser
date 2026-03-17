@@ -1,7 +1,12 @@
 ﻿using XmlParser.src.gui;
 
-namespace XMLParser.src
+namespace XmlParser.src
 {
+    internal delegate string FormatSupplier(char quote);
+
+    internal delegate bool MatchDelegate(Match match);
+
+    internal delegate void InitExpression(out string toInit);
     internal static class Constants
     {
         // made static since we only need one colorscheme for the entire program.

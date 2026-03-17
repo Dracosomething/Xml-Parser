@@ -1,5 +1,4 @@
-﻿using XmlParser.src.extentions;
-using XMLParser.src;
+﻿using XmlParser.src.extentions.@string;
 
 namespace XmlParser.src.xml
 {
@@ -170,9 +169,11 @@ namespace XmlParser.src.xml
             // return false
             // otherwise return true
             body = body.TrimEnd(Constants.whiteSpace);
-            while (body != string.Empty)
+            string[] attributes = body.Split(Constants.whiteSpace, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < attributes.Length; i++)
             {
-                if (!CheckAllRefernces(body, [GenericXMLLookupTable["S"], ReadAttribute], [1, 1], out body))
+                string attribute = attributes[i];
+                if (!ReadAttribute(attribute))
                     return false;
             }
             return toCheckString.EndsWith(GenericXMLLookupTable["S"]);

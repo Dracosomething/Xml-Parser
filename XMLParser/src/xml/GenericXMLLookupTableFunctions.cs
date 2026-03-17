@@ -1,4 +1,4 @@
-﻿using XmlParser.src.extentions;
+﻿using XmlParser.src.extentions.@string;
 
 namespace XmlParser.src.xml
 {

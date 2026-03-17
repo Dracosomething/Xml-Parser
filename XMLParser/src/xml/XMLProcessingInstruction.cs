@@ -1,4 +1,4 @@
-﻿namespace XMLParser.src.xml
+﻿namespace XmlParser.src.xml
 {
     internal class XMLProcessingInstruction
     {

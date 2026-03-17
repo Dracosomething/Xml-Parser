@@ -52,7 +52,7 @@ namespace XmlParser.src
             return new Pair<TKey, TValue> { Key = key, Value = value! };
         }
 
-        public TValue Get(TKey key) 
+        public TValue Get(TKey key)
         {
             bool success = table.TryGetValue(key, out TValue? value);
             if (!success)

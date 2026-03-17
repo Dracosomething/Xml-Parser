@@ -9,14 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Resources\badXmlData.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Update="Resources\badXmlData.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\dummy.dtd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\dummy.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\dummyStandalone.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\other.dtd">

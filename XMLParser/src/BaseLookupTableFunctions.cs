@@ -1,6 +1,4 @@
-﻿using XmlParser.src.extentions;
-
-namespace XmlParser.src
+﻿namespace XmlParser.src
 {
     internal class BaseLookupTableFunctions
     {
@@ -27,9 +25,8 @@ namespace XmlParser.src
             updated = string.Empty;
             return ReturnAndInitialze((out toInit) =>
             {
-                toInit = text.Substring(new Range { StartIndex = start.EndIndex, EndIndex = end.EndIndex });
-                return AssertContained(text, minLen, start, end);
-            }, out updated);
+                toInit = text.Substring(new Range { StartIndex = text.IndexOf(start), EndIndex = text.LastIndexOf(end) });
+            }, out updated, () => AssertContained(text, minLen, start, end));
         }
 
         protected bool AssertCharacter(string text) => text.Length == 1;
@@ -41,8 +38,7 @@ namespace XmlParser.src
             return ReturnAndInitialze((out toInit) =>
             {
                 toInit = text.Replace(quote.ToString(), "");
-                return text.ContainedWithin("'") || text.ContainedWithin('"');
-            }, out updated);
+            }, out updated, () => text.ContainedWithin("'") || text.ContainedWithin('"'));
         }
 
         protected bool CheckReference(string text, Func<string, bool> func, MatchDelegate notMatch, MatchDelegate shouldMatch, out string update)
@@ -52,8 +48,7 @@ namespace XmlParser.src
             return ReturnAndInitialze((out updated) =>
             {
                 updated = text.Remove(match.StartIndex, match.Length);
-                return match.Found && !notMatch(match) && shouldMatch(match);
-            }, out update);
+            }, out update, () => match.Found && !notMatch(match) && shouldMatch(match));
         }
 
         protected bool CheckReference(string text, Func<string, bool> func, int minlength, out string updated)
@@ -99,6 +94,16 @@ namespace XmlParser.src
             return items.Length > 1 && items.All(func);
         }
 
-        protected bool ReturnAndInitialze(ReturnExpression output, out string toInit) => output(out toInit);
+        protected bool ReturnAndInitialze(InitExpression expression, out string toInit, Func<bool> output)
+        {
+            toInit = string.Empty;
+            if (output())
+            {
+                expression(out toInit);
+                return true;
+            }
+            else
+                return false;
+        }
     }
 }
