@@ -59,9 +59,19 @@ namespace XmlParser.src.xml
 
         // XMLDecl? Misc* (doctypedecl Misc*)?
         // the (doctypedecl Misc*)? has not been implemented yet
-        private bool ReadProlog(string toCheckString) =>
-            ReadOptional(toCheckString, 0, ReadXMLDeclreration, out string extra) &&
-            (extra == string.Empty || extra.AllString(GenericXMLLookupTable["Misc"]));
+        private bool ReadProlog(string toCheckString)
+        {
+            ReadOptional(toCheckString, 0, ReadXMLDeclreration, out string extra);
+            if (extra != string.Empty)
+            {
+                for (int i = 0; i < extra.Length; i++)
+                {
+                    if (!CheckReference(extra, GenericXMLLookupTable["Misc"], 1, out extra))
+                        return false;
+                }
+            }
+            return true;
+        }
 
         // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
         private bool ReadXMLDeclreration(string toCheckString) =>
@@ -133,7 +143,7 @@ namespace XmlParser.src.xml
                 }
                 else
                 {
-                    Func<string, bool> func = (str) =>
+                    bool func(string str) =>
                         GenericXMLLookupTable["Reference"](str) ||
                         ReadCharacterDataSection(str) ||
                         GenericXMLLookupTable["PI"](str) ||

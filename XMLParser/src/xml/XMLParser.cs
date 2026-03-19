@@ -36,21 +36,26 @@ namespace XmlParser.src.xml
             var readBody = table["element"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("element"));
             string body = reader.Read(readBody);
             var rootElement = ParseBody(body);
-
-            return new XMLFile { Root = null };
+            return new XMLFile
+            {
+                Root = rootElement,
+                MetaData = metaData,
+                ProcessingInstructions = this.processingInstructions.ToArray()
+            };
         }
 
-        private string Normalize(string text) => Utils.RegexReplace(text.Replace("\r\n", "\n"), "\n", @"\r(?!\n)");
+        private string Normalize(string text) =>
+            Utils.RegexReplace(text.Replace("\r\n", "\n"), "\n", @"\r(?!\n)");
 
         private string PreProcess(string text) =>
             text.Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").Replace("&apos;", "'").Replace("&quot;", "\"");
 
-        private void ParseMisc(FileReader reader)
+        private void ParseMisc(ref readonly FileReader reader)
         {
-            var readMisc = table["Misc"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("Misc"));
-            var readSpace = table["S"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("S"));
-            var readComment = table["comment"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("comment"));
-            var readPI = table["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
+            var readMisc = genericTable["Misc"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("Misc"));
+            var readSpace = genericTable["S"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("S"));
+            var readComment = genericTable["comment"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("comment"));
+            var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
             while (!reader.EndOfFile)
             {
                 string line = reader.Read(readMisc);
@@ -81,9 +86,9 @@ namespace XmlParser.src.xml
                 xmlDecl = xmlDecl.Substring(5, xmlDecl.EndIndex);
                 var declarationReader = new FileReader(xmlDecl);
 
-                var readVerInfo = table["VersionInfo"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("VersionInfo"));
-                var readEncoding = table["EncodingDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("EncodingDecl"));
-                var readStandAlone = table["SDDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("SDDecl"));
+                var readVerInfo = genericTable["VersionInfo"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("VersionInfo"));
+                var readEncoding = genericTable["EncodingDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("EncodingDecl"));
+                var readStandAlone = genericTable["SDDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("SDDecl"));
 
                 string versionInfo = declarationReader.Read(readVerInfo);
                 if (!readVerInfo(versionInfo))
@@ -99,7 +104,7 @@ namespace XmlParser.src.xml
                     standalone = ReadStandalone(standaloneDecleration);
             }
 
-            ParseMisc(reader);
+            ParseMisc(ref reader);
 
             return new XMLMetaData { Version = version, Encoding = encoding, Standalone = standalone };
         }
@@ -113,13 +118,15 @@ namespace XmlParser.src.xml
         private bool ReadStandalone(string standaloneDecleration) =>
             ReadMetaDataAttributeValue(standaloneDecleration, "SDDecl", (value) => value.Replace("'", "").Replace("\"", "") == "yes");
 
-        private XMLElement ParseBody(string body) => ParseElement(body);
+        private XMLElement ParseBody(string body) =>
+            ParseElement(body);
 
         private XMLElement ParseElement(string element)
         {
             var readElement = table["element"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("element"));
             if (!readElement(element))
                 throw new FormatException("Body is not in the correct format. element:" + element);
+
             var emptyElement = table["EmptyElemTag"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("EmptyElemTag"));
             var reader = new FileReader(element);
             if (emptyElement(element))
@@ -129,11 +136,31 @@ namespace XmlParser.src.xml
             string openingTag = reader.Read(readStartTag);
             if (!readStartTag(openingTag))
                 throw new FormatException("openingTag is not int the correct format for a starting tag. openingTag:" + openingTag);
+
             var startingTagData = ParseOpeningTag(openingTag, in reader);
-            // closing symbol
+            var readEndingTag = table["ETag"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("ETag"));
+
             string leftOverData = reader.LeftOver;
             // remove spaces and closing '>'
+            leftOverData = leftOverData.TrimStart(Constants.whiteSpace).Remove(0, 1);
+            if (readEndingTag(leftOverData))
+                return startingTagData;
 
+            reader = new FileReader(leftOverData);
+            var readContent = table["content"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("content"));
+            string body = reader.Read(readContent);
+            if (!readContent(body))
+                throw new FormatException("content is in the wrong format. body:" + body);
+            var data = ParseXMLElementContent(body);
+            return new XMLElement
+            {
+                Name = startingTagData.Name,
+                Attributes = startingTagData.Attributes,
+                Language = startingTagData.Language,
+                Space = startingTagData.Space,
+                UnparsedContent = body,
+                ParsedContent = data
+            };
         }
 
         private XMLElement ParseOpeningTag(string tag, in FileReader reader)
@@ -171,7 +198,7 @@ namespace XmlParser.src.xml
             return dic;
         }
 
-        private Pair<string, string> ParseAttribute(string attribute, in Dictionary<string, string> dic)
+        private Pair<string, string> ParseAttribute(string attribute, ref readonly Dictionary<string, string> dic)
         {
             string[] pair = attribute.Split('=', 1);
             ArgumentOutOfRangeException.ThrowIfNotEqual(pair.Length, 2, "pair");
@@ -183,12 +210,61 @@ namespace XmlParser.src.xml
             return new Pair<string, string> { Key = name, Value = value };
         }
 
+        private XMLData ParseXMLElementContent(string content)
+        {
+            var readContent = table["content"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("content"));
+            if (!readContent(content))
+                throw new FormatException("content is in the wrong format. content:" + content);
+
+            // we want to handle the character data like normal text
+            // any encountered xml elements should be parsed on their own and then added to the elements
+            // all the character data sections should be treated like normal text
+            // processing instructions should be treated like normal processing instructions
+            // comments should be ignored
+            var readComment = genericTable["comment"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("comment"));
+            var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
+            var readElement = table["element"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("element"));
+            var readCDSect = table["CDSect"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("CDSect"));
+            bool readData(string line) => readComment(line) || readPI(line) || readCDSect(line) || readElement(line);
+
+            var readCharData = table["CharData"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("CharData"));
+            var reader = new FileReader(content);
+            string text = "";
+            List<XMLElement> elements = new();
+            while (!reader.EndOfFile)
+            {
+                if (reader.LeftOver.StartsWith(readCharData))
+                {
+                    text += reader.Read(readCharData);
+                    continue;
+                }
+                string data = reader.Read(readData);
+                if (!readData(data))
+                    throw new FormatException("data is not a comment, processing instruction, element or character data section. data:" + data);
+                switch (data)
+                {
+                    case var _ when readPI(data):
+                        ParseProcessingInstruction(data);
+                        break;
+                    case var _ when readCDSect(data):
+                        text += ParseCharacterDataSection(data);
+                        break;
+                    case var _ when readElement(data):
+                        elements.Add(ParseElement(data));
+                        break;
+                    case var _ when readComment(data):
+                        continue;
+                }
+            }
+            return new XMLData { Text = text, Children = elements };
+        }
+
         private void ParseProcessingInstruction(string instruction)
         {
-            var readPI = table["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
+            var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
             if (!readPI(instruction))
                 throw new FormatException("Processing instruction was in an invalid format. Instruction:" + instruction);
-            var match = instruction.FirstMatch(table["PITarget"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PITarget")));
+            var match = instruction.FirstMatch(genericTable["PITarget"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PITarget")));
             if (!match.Found || match.StartIndex < 2)
                 throw new FormatException("Processing instruction does not have a target at the corrent position. Instruction:" + instruction);
             string name = instruction.Substring(match);
@@ -196,9 +272,19 @@ namespace XmlParser.src.xml
             this.processingInstructions.Add(new XMLProcessingInstruction { PITarget = name, Data = body });
         }
 
+        private string ParseCharacterDataSection(string section)
+        {
+            if (!section.StartsWith("<![CDATA[") || !section.EndsWith("]]>"))
+                throw new FormatException("section does not start with \"<![CDATA[\" or does not end with \"]]>\". section:" + section);
+            string toReturn = section.RemoveFirst("<![CDATA[").RemoveFirst("]]>");
+            return toReturn.Contains("]]>") ?
+                throw new FormatException("toReturn contains \"]]>\" which it is not allowed to contain. toReturn:" + toReturn) :
+                toReturn;
+        }
+
         private TResult ReadMetaDataAttributeValue<TResult>(string attribute, string tableKey, Func<string, TResult> output)
         {
-            var func = table[tableKey] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage(tableKey));
+            var func = genericTable[tableKey] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage(tableKey));
             if (!func(attribute))
                 throw new FormatException($"{tableKey} is not in a valid format. attribute:" + attribute);
             int equalsIndex = attribute.IndexOf('=');

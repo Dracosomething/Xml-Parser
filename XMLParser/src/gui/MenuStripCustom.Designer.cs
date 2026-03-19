@@ -62,7 +62,7 @@ namespace XmlParser.src.gui
             // menuBar
             //
             this.Items.AddRange(new ToolStripItem[] { file, settings });
-            this.BackColor = Utils.colorScheme.Secondary;
+            this.BackColor = Constants.colorScheme.Secondary;
             this.Size = new Size(screenWidth, barHeight);
             this.Location = new Point(0, 0);
             this.Renderer = new MenuStripCustomRenderer();
@@ -75,8 +75,8 @@ namespace XmlParser.src.gui
                 this.exit });
             this.file.Size = new Size(width, height * this.file.DropDownItems.Count);
             this.file.Font = this.font;
-            this.file.ForeColor = Utils.colorScheme.Text;
-            this.file.BackColor = Utils.colorScheme.Secondary;
+            this.file.ForeColor = Constants.colorScheme.Text;
+            this.file.BackColor = Constants.colorScheme.Secondary;
             
             //
             // settings
@@ -85,8 +85,8 @@ namespace XmlParser.src.gui
                 this.darkMode });
             this.settings.Size = new Size(width, height * this.settings.DropDownItems.Count);
             this.settings.Font = this.font;
-            this.settings.ForeColor = Utils.colorScheme.Text;
-            this.settings.BackColor = Utils.colorScheme.Secondary;
+            this.settings.ForeColor = Constants.colorScheme.Text;
+            this.settings.BackColor = Constants.colorScheme.Secondary;
 
             this.darkMode.MouseUp += new MouseEventHandler(this.onClickDarkItem);
             this.openFile.MouseUp += new MouseEventHandler(this.onClickOpenFile);
@@ -96,8 +96,8 @@ namespace XmlParser.src.gui
             {
                 item.Font = this.font;
                 item.Size = new Size(width, height);
-                item.BackColor = Utils.colorScheme.Accent;
-                item.ForeColor = Utils.colorScheme.Text;
+                item.BackColor = Constants.colorScheme.Accent;
+                item.ForeColor = Constants.colorScheme.Text;
             }
 
             this.ResumeLayout(false);

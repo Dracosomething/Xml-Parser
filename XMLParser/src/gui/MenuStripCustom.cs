@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using XmlParser.src;
-using XmlParser.src.xml;
+﻿using XmlParser.src.xml;
 
 namespace XmlParser.src.gui
 {
@@ -41,7 +31,7 @@ namespace XmlParser.src.gui
                 main.Close();
             }
         }
-        
+
         private void onClickOpenFile(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -53,7 +43,7 @@ namespace XmlParser.src.gui
                 if (this.openFileDialogue.ShowDialog() == DialogResult.OK)
                 {
                     var parser = new XMLParser(this.openFileDialogue.FileName);
-                    this.fileContent.Text = parser.Content;
+
                 }
             }
         }
@@ -62,20 +52,20 @@ namespace XmlParser.src.gui
         {
             if (e.Button == MouseButtons.Left)
             {
-                Utils.colorScheme.ChangeDarkMode();
-                main.BackColor = Utils.colorScheme.Primary;
-                this.BackColor = Utils.colorScheme.Secondary;
-                this.file.ForeColor = Utils.colorScheme.Text;
-                this.file.BackColor = Utils.colorScheme.Secondary;
-                this.settings.ForeColor = Utils.colorScheme.Text;
-                this.settings.BackColor = Utils.colorScheme.Secondary;
-                this.fileContent.ForeColor = Utils.colorScheme.Text;
-                this.fileContent.BackColor = Utils.colorScheme.Primary;
+                Constants.colorScheme.ChangeDarkMode();
+                main.BackColor = Constants.colorScheme.Primary;
+                this.BackColor = Constants.colorScheme.Secondary;
+                this.file.ForeColor = Constants.colorScheme.Text;
+                this.file.BackColor = Constants.colorScheme.Secondary;
+                this.settings.ForeColor = Constants.colorScheme.Text;
+                this.settings.BackColor = Constants.colorScheme.Secondary;
+                this.fileContent.ForeColor = Constants.colorScheme.Text;
+                this.fileContent.BackColor = Constants.colorScheme.Primary;
                 var items = new List<ToolStripMenuItem> { openFile, exit, darkMode };
                 foreach (ToolStripMenuItem item in items)
                 {
-                    item.BackColor = Utils.colorScheme.Accent;
-                    item.ForeColor = Utils.colorScheme.Text;
+                    item.BackColor = Constants.colorScheme.Accent;
+                    item.ForeColor = Constants.colorScheme.Text;
                 }
             }
         }

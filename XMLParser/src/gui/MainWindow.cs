@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using XmlParser.src.xml.dtd;
-
-namespace XmlParser.src.gui
+﻿namespace XmlParser.src.gui
 {
     public partial class MainWindow : Form
     {

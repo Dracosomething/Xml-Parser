@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text;
 
 namespace XmlParser.src.xml
 {
@@ -16,5 +17,26 @@ namespace XmlParser.src.xml
         public WhiteSpaceHandling? Space { get; init; } = null;
         public string UnparsedContent { get; init; } = string.Empty;
         public XMLData? ParsedContent { get; init; } = null;
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder("{ ");
+
+            builder
+                .Append("Name: ")
+                .Append(Name)
+                .Append(", Attributes: ")
+                .Append(Attributes.ToString())
+                .Append(", Language: ")
+                .Append(Language == null ? "null" : Language.ToString())
+                .Append(", Space: ")
+                .Append(Space == null ? "null" : Space.ToString())
+                .Append(", UnparsedContent: { ")
+                .Append(UnparsedContent)
+                .Append(" }, ParsedContent: ")
+                .Append(ParsedContent);
+
+            return builder.Append(" }").ToString();
+        }
     }
 }

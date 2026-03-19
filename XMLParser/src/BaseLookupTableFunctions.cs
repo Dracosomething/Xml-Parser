@@ -1,4 +1,6 @@
-﻿namespace XmlParser.src
+﻿using XmlParser.src.extentions.@string;
+
+namespace XmlParser.src
 {
     internal class BaseLookupTableFunctions
     {
@@ -25,7 +27,7 @@
             updated = string.Empty;
             return ReturnAndInitialze((out toInit) =>
             {
-                toInit = text.Substring(new Range { StartIndex = text.IndexOf(start), EndIndex = text.LastIndexOf(end) });
+                toInit = text.Substring(new Range { StartIndex = text.IndexOf(start), EndIndex = text.LastIndexOf(end) }); // start at end of text length or some shit ig
             }, out updated, () => AssertContained(text, minLen, start, end));
         }
 

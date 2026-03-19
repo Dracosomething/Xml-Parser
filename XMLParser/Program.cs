@@ -1,4 +1,5 @@
 ﻿using XmlParser.src.gui;
+using XmlParser.src.xml;
 
 namespace XmlParser
 {
@@ -35,6 +36,11 @@ namespace XmlParser
 
             // implement namespaces later on
             // defined in https://www.w3.org/TR/xml-names/
+
+            string targetFile = "./Resources/dummyStandalone.xml";
+            var parser = new XMLParser(targetFile);
+            var processed = parser.Parse();
+            Console.WriteLine(processed.ToString());
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -21,6 +21,20 @@
                 ArgumentOutOfRangeException.ThrowIfLessThan(length, 1, "length");
                 return str.Remove(str.Length - length);
             }
+
+            public string RemoveFirst(string toRemove)
+            {
+                ArgumentNullException.ThrowIfNullOrEmpty(toRemove, "toRemove");
+                int startIndex = str.IndexOf(toRemove);
+                return str.Remove(startIndex, toRemove.Length);
+            }
+
+            public string RemoveLast(string toRemove)
+            {
+                ArgumentNullException.ThrowIfNullOrEmpty(toRemove, "toRemove");
+                int startIndex = str.LastIndexOf(toRemove);
+                return str.Remove(startIndex, toRemove.Length);
+            }
         }
     }
 }
