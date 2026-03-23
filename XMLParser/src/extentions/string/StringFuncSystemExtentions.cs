@@ -10,31 +10,33 @@
             /// <param name="func"></param>
             /// <param name="start"></param>
             /// <returns></returns>
-            public Match FirstMatch(Func<string, bool> func, int start = 0)
+            // todo: add an option to loop ones
+            public Match FirstMatch(Func<string, bool> func, int start = 0, bool referce = false)
             {
                 // validate the arguemnts
                 if (func == null || start > str.Length)
                     return new Match { Found = false };
 
                 int currentLength = 1;
-                string sub = str.Substring(start, currentLength);
-                int len = str.Length - start - 1;
-                while (!func(sub))
+                string sub = referce ? str : str.Substring(start, currentLength);
+                int len = str.EndIndex - start;
+                while (true)
                 {
                     if (func(sub))
-                        break;
-                    if (currentLength + 1 >= len)
+                        return new Match
+                        {
+                            Found = true,
+                            EndIndex = referce ? str.Length : start + currentLength,
+                            StartIndex = start,
+                            Result = sub
+                        };
+                    if (currentLength + 1 >= len || (referce && sub.Length - 1 == 0))
                         return new Match { Found = false };
-                    sub = str.Substring(start, ++currentLength);
+                    if (referce)
+                        sub = sub.RemoveLast();
+                    else
+                        sub = str.Substring(start, ++currentLength);
                 }
-
-                return new Match
-                {
-                    Found = true,
-                    EndIndex = start + currentLength,
-                    StartIndex = start,
-                    Result = sub
-                };
             }
 
             public string Substring(Func<string, bool> func, int start = 0)
@@ -49,7 +51,7 @@
             {
                 for (int i = 0; i < str.Length; i++)
                 {
-                    var match = str.FirstMatch(func, i);
+                    var match = str.FirstMatch(func, i, true);
                     if (match.Found)
                         return true;
                 }
@@ -64,26 +66,13 @@
 
             public bool EndsWith(Func<string, bool> func)
             {
-                var match = str.FirstMatch(func);
+                var match = str.FirstMatch(func, 0, true);
                 return match.Found && match.EndIndex == str.Length - 1;
             }
 
-            public bool AllString(Func<string, bool> predicate)
+            public bool AllAsString(Func<string, bool> predicate)
             {
                 return str.All(c => predicate(c.ToString()));
-            }
-
-            public string Replace(Func<string, bool> old, string _new)
-            {
-                string retVal = str;
-                while (true)
-                {
-                    var match = retVal.FirstMatch(old);
-                    if (!match.Found)
-                        break;
-                    retVal = retVal.Remove(match.StartIndex, match.Length);
-                }
-                return retVal;
             }
         }
     }

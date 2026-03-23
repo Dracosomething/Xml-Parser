@@ -1,4 +1,5 @@
-﻿using XmlParser.src.extentions.@string;
+﻿using System.Text.RegularExpressions;
+using XmlParser.src.extentions.@string;
 
 namespace XmlParser.src.xml
 {
@@ -55,40 +56,56 @@ namespace XmlParser.src.xml
         // '<![CDATA[' (Char* - (Char* ']]>' Char*)) ']]>'
         private bool ReadCharacterDataSection(string toCheckString) =>
             AssertContainedAndUpdate(toCheckString, 13, "<![CDATA[", "]]>", out string body) &&
-            (body.AllString(GenericXMLLookupTable["Char"]) && !body.Contains("]]>"));
+            (body.AllAsString(GenericXMLLookupTable["Char"]) && !body.Contains("]]>"));
 
         // XMLDecl? Misc* (doctypedecl Misc*)?
         // the (doctypedecl Misc*)? has not been implemented yet
         private bool ReadProlog(string toCheckString)
         {
-            ReadOptional(toCheckString, 0, ReadXMLDeclreration, out string extra);
-            if (extra != string.Empty)
-            {
-                for (int i = 0; i < extra.Length; i++)
-                {
-                    if (!CheckReference(extra, GenericXMLLookupTable["Misc"], 1, out extra))
-                        return false;
-                }
-            }
-            return true;
+            // we want to get rid of this call
+            ReadOptional(toCheckString, 0, ReadXMLDeclreration, out string extra, true);
+            extra = extra.Replace(" ", "").Replace("\n", "").Replace("\t", "").Replace("\r", "");
+            if (extra.Length == 0)
+                return true;
+            string[] instructions = Regex.Split(extra, @"(?<=\?>)");
+            return instructions.All(GenericXMLLookupTable["PI"]);
         }
 
         // '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
-        private bool ReadXMLDeclreration(string toCheckString) =>
+        private bool ReadXMLDeclreration(string toCheckString)
+        {
             // min length = '<?xml'.Length + VersionInfo->minLength + '?>'.Length = 5 + 14 + 2 = 21
-            AssertContainedAndUpdate(toCheckString, 21, "<?xml", "?>", out string body) &&
-            // VersionInfo
-            CheckReference(body, GenericXMLLookupTable["VersionInfo"],
-                match => match.StartIndex == 0 && match.Length >= 14,
-                match => true,
-                out body) &&
-            // EncodingDecl?
-            ReadOptional(body, 0, GenericXMLLookupTable["EncodingDecl"], out body) &&
-            // SDDecl?
-            ReadOptional(body, 0, ReadstandaloneDocumentDecleration, out body) &&
-            // S?
-            ReadOptional(body, 0, GenericXMLLookupTable["S"], out body) &&
-            body == string.Empty; // string must be empty after this.
+            if (!AssertContainedAndUpdate(toCheckString, 21, "<?xml", "?>", out string body))
+                return false;
+            // remove the trailing whitespace
+            body = body.TrimEnd(Constants.whiteSpace);
+            // get all the individual properties
+            string[] tripple = Regex.Split(body, @"(?<='|\u0022)(?=[\s\t\r\n])");
+            for (int i = 0; i < tripple.Length; i++)
+            {
+                string property = tripple[i];
+                Func<string, bool> predicate;
+                switch (i)
+                {
+                    // first one should always be VersionInfo
+                    case 0:
+                        predicate = GenericXMLLookupTable["VersionInfo"];
+                        break;
+                    // second one can be eather encoding decleration or sd decleration, find out by checking if it starts with encoding when trimed
+                    case 1:
+                        predicate = GenericXMLLookupTable["EncodingDecl"];
+                        break;
+                    case 2:
+                        predicate = ReadstandaloneDocumentDecleration;
+                        break;
+                    default:
+                        return false;
+                }
+                if (!predicate(property))
+                    return false;
+            }
+            return true;
+        }
 
         // S 'standalone' Eq (("'" ('yes' | 'no') "'") | ('"' ('yes' | 'no') '"'))
         private bool ReadstandaloneDocumentDecleration(string toCheckString) =>
@@ -97,9 +114,32 @@ namespace XmlParser.src.xml
         // EmptyElemTag | STag content ETag 
         private bool ReadElement(string toCheckString) =>
             ReadEmptyElementTag(toCheckString) ||
-                (CheckReference(toCheckString, ReadStartTag, 4, out toCheckString) &&
-                 CheckReference(toCheckString, ReadContent, 3, out toCheckString) &&
-                 CheckReference(toCheckString, ReadEndTag, 4, out toCheckString));
+        // fix this by getting the first instance of '>' and then checking if from start to that pos is equal to a start tag
+        // then get the last index of  '<' and substring it there to check if it is equal to an end tag
+        // lastly check if everything inbetween is equal to content
+        /*(CheckReference(toCheckString, ReadStartTag, 4, out toCheckString) &&
+         CheckReference(toCheckString, ReadContent, -1, out toCheckString) &&
+         CheckReference(toCheckString, ReadEndTag, 4, out toCheckString));*/
+        Return(() =>
+            {
+                int endPosStartingTag = toCheckString.IndexOf('>');
+                if (endPosStartingTag == -1)
+                    return false;
+                string startTag = toCheckString[..endPosStartingTag];
+                if (!ReadStartTag(startTag))
+                    return false;
+                string contentAndEndTag = toCheckString[endPosStartingTag..];
+                int startPosClosingTag = contentAndEndTag.LastIndexOf("<");
+                if (startPosClosingTag == -1)
+                    return false;
+                string endTag = contentAndEndTag[startPosClosingTag..];
+                if (!ReadEndTag(endTag))
+                    return false;
+                string content = contentAndEndTag[..startPosClosingTag];
+                if (!ReadContent(content))
+                    return false;
+                return true;
+            });
 
         // '<' Name (S Attribute)* S? '>'
         private bool ReadStartTag(string toCheckString) =>
@@ -111,7 +151,7 @@ namespace XmlParser.src.xml
             CheckAllRefernces(toCheckString, [
                 GenericXMLLookupTable["Name"],
                 GenericXMLLookupTable["Eq"],
-                GenericXMLLookupTable["AttValye"]
+                GenericXMLLookupTable["AttValue"]
             ], [1, 1, 2], out toCheckString) &&
             toCheckString == string.Empty;
 
@@ -161,6 +201,7 @@ namespace XmlParser.src.xml
         private bool ReadEmptyElementTag(string toCheckString) =>
             ReadTag(toCheckString, "/>");
 
+        // '<' Name (S Attribute)* S? <close>
         private bool ReadTag(string toCheckString, string close)
         {
             if (!AssertContainedAndUpdate(toCheckString, 4, "<", close, out string body))
@@ -170,7 +211,7 @@ namespace XmlParser.src.xml
                 out body))
                 return false;
             // read space and check if there is still space left in the string
-            ReadOptional(body, 0, GenericXMLLookupTable["S"], out string tmp);
+            string tmp = body.TrimStart(Constants.whiteSpace);
             if (tmp == string.Empty)
                 return true;
             // first remove the trailing space

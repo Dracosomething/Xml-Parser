@@ -15,9 +15,9 @@ namespace XmlParser.src
             return Utils.RegexMatch(unquoted, supplier(quote));
         }
 
-        protected bool AssertMinLength(string text, int minLen) => text.Length > minLen;
+        protected bool AssertMinLength(string text, int minLen) => text.Length >= minLen;
 
-        protected bool AssertMinLength(Array arr, int minLen) => arr.Length > minLen;
+        protected bool AssertMinLength(Array arr, int minLen) => arr.Length >= minLen;
 
         protected bool AssertContained(string text, int minLen, string start, string end) =>
             AssertMinLength(text, minLen) && text.ContainedWithin(start, end);
@@ -27,7 +27,7 @@ namespace XmlParser.src
             updated = string.Empty;
             return ReturnAndInitialze((out toInit) =>
             {
-                toInit = text.Substring(new Range { StartIndex = text.IndexOf(start), EndIndex = text.LastIndexOf(end) }); // start at end of text length or some shit ig
+                toInit = text.Substring(new Range { StartIndex = text.IndexOf(start) + start.Length, EndIndex = text.LastIndexOf(end) }); // start at end of text length or some shit ig
             }, out updated, () => AssertContained(text, minLen, start, end));
         }
 
@@ -46,7 +46,7 @@ namespace XmlParser.src
         protected bool CheckReference(string text, Func<string, bool> func, MatchDelegate notMatch, MatchDelegate shouldMatch, out string update)
         {
             update = string.Empty;
-            var match = text.FirstMatch(func);
+            var match = text.FirstMatch(func, 0);
             return ReturnAndInitialze((out updated) =>
             {
                 updated = text.Remove(match.StartIndex, match.Length);
@@ -79,10 +79,10 @@ namespace XmlParser.src
             return true;
         }
 
-        protected bool ReadOptional(string text, int startPos, Func<string, bool> func, out string updated)
+        protected bool ReadOptional(string text, int startPos, Func<string, bool> func, out string updated, bool referce = false)
         {
             updated = text;
-            var match = text.FirstMatch(func);
+            var match = text.FirstMatch(func, 0, referce);
             if (match.Found && match.StartIndex == startPos)
                 updated = text.Remove(match.StartIndex, match.Length);
             return true;
@@ -107,5 +107,7 @@ namespace XmlParser.src
             else
                 return false;
         }
+
+        protected bool Return(Func<bool> output) => output();
     }
 }

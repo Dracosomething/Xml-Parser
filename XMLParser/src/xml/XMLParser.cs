@@ -25,8 +25,10 @@ namespace XmlParser.src.xml
 
         internal XMLFile Parse()
         {
-            string text = PreProcess(Normalize(File.ReadAllText(file.FullName)));
+            string text = RemoveComments(PreProcess(Normalize(File.ReadAllText(file.FullName))));
             var readProlog = table["prolog"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("prolog"));
+            // split at end of xml decleration
+            // read xmldecleration seperate from the xml decleration
             if (!text.StartsWith(readProlog))
                 throw new FormatException("File does not start with a prologue.");
             var reader = new FileReader(text);
@@ -50,11 +52,29 @@ namespace XmlParser.src.xml
         private string PreProcess(string text) =>
             text.Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").Replace("&apos;", "'").Replace("&quot;", "\"");
 
+        private string RemoveComments(string text)
+        {
+            var readComment = genericTable["comment"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("comment"));
+            while (true)
+            {
+                int commentStart = text.IndexOf("<!--");
+                if (commentStart == -1)
+                    return text;
+                int commentEnd = text.IndexOf("-->");
+                if (commentEnd <= commentStart || commentEnd == -1)
+                    throw new FormatException($"Encountered a comment in the file that was not in the correct syntax. " +
+                        $"commentStart:{commentStart}, commentEnd:{commentEnd}, text:{text}");
+                string comment = text.Substring(new Range { StartIndex = commentStart, EndIndex = commentEnd + 3 });
+                if (!readComment(comment))
+                    throw new FormatException($"Encountered a comment in the file that was not in the correct syntax. " +
+                        $"commentStart:{commentStart}, commentEnd:{commentEnd}, comment:{comment}, text:{text}");
+                text = text.Replace(comment, "");
+            }
+        }
+
         private void ParseMisc(ref readonly FileReader reader)
         {
             var readMisc = genericTable["Misc"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("Misc"));
-            var readSpace = genericTable["S"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("S"));
-            var readComment = genericTable["comment"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("comment"));
             var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
             while (!reader.EndOfFile)
             {
@@ -63,9 +83,9 @@ namespace XmlParser.src.xml
                 {
                     case var _ when readPI(line):
                         ParseProcessingInstruction(line);
-                        break;
-                    case var _ when readSpace(line) || readComment(line):
-                        break;
+                        continue;
+                    case var _ when line.Trim(Constants.whiteSpace) == string.Empty:
+                        continue;
                     default:
                         throw new FormatException("Misc was not in the correct format.");
                 }
@@ -221,11 +241,10 @@ namespace XmlParser.src.xml
             // all the character data sections should be treated like normal text
             // processing instructions should be treated like normal processing instructions
             // comments should be ignored
-            var readComment = genericTable["comment"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("comment"));
             var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
             var readElement = table["element"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("element"));
             var readCDSect = table["CDSect"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("CDSect"));
-            bool readData(string line) => readComment(line) || readPI(line) || readCDSect(line) || readElement(line);
+            bool readData(string line) => readPI(line) || readCDSect(line) || readElement(line);
 
             var readCharData = table["CharData"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("CharData"));
             var reader = new FileReader(content);
@@ -252,8 +271,6 @@ namespace XmlParser.src.xml
                     case var _ when readElement(data):
                         elements.Add(ParseElement(data));
                         break;
-                    case var _ when readComment(data):
-                        continue;
                 }
             }
             return new XMLData { Text = text, Children = elements };
