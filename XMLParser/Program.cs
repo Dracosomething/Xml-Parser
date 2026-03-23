@@ -37,10 +37,20 @@ namespace XmlParser
             // implement namespaces later on
             // defined in https://www.w3.org/TR/xml-names/
 
-            string targetFile = "./Resources/dummyStandalone.xml";
-            var parser = new XMLParser(targetFile);
-            var processed = parser.Parse();
-            Console.WriteLine(processed.ToString());
+            var now = DateTime.Now;
+            string fname = $"./logs/{now.Hour}-{now.Minute}-{now.Second}.{now.Millisecond}_{now.Day}-{now.Month}-{now.Year}_log.txt";
+            using (TextWriter writer = new StreamWriter(fname))
+            {
+                DateTime start;
+                DateTime end;
+                writer.WriteLine($"start: {start = DateTime.Now}");
+                string targetFile = "./Resources/dummyStandalone.xml";
+                var parser = new XMLParser(targetFile);
+                var processed = parser.Parse();
+                writer.WriteLine($"end: {end = DateTime.Now}");
+                var duration = start.Subtract(end);
+                writer.WriteLine($"took {duration} to compute {processed}");
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

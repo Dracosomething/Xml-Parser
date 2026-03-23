@@ -7,11 +7,11 @@ namespace XmlParser.src
         protected bool ReadQuoted(string quoted, FormatSupplier supplier)
         {
             if (!AssertMinLength(quoted, 2) || // make shure string is at least 2 characters long
-                (!quoted.ContainedWithin('"') || // if the string is not within quotes we can savely return false
-                !quoted.ContainedWithin("'")))
+                !(quoted.ContainedWithin('"') || // if the string is not within quotes we can savely return false
+                  quoted.ContainedWithin("'")))
                 return false;
             char quote = quoted.First();
-            string unquoted = quoted.Substring(new Range { StartIndex = 1, EndIndex = quoted.EndIndex - 1 });
+            string unquoted = quoted.Substring(new Range { StartIndex = 1, EndIndex = quoted.EndIndex });
             return Utils.RegexMatch(unquoted, supplier(quote));
         }
 

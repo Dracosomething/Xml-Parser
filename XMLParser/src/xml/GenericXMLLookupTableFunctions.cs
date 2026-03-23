@@ -81,23 +81,24 @@ namespace XmlParser.src.xml
 
         // '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>'
         // PITarget = Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
-        private bool ReadProcessingInstruction(string toCheckString) =>
+        private bool ReadProcessingInstruction(string toCheckString)
+        {
             // Check for the '<?' and '?>' at the start and end resprectively
-            AssertContainedAndUpdate(toCheckString, 6, "<?", "?>", out string body) &&
+            if (!AssertContainedAndUpdate(toCheckString, 6, "<?", "?>", out string body))
+                return false;
+            string[] tokens = body.Split(Constants.whiteSpace, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length < 1)
+                return false;
             // PITarget
-            CheckReference(body, ReadName,
-                match => match.StartIndex != 0 && match.Result.ToLower() == "xml",
-                match => match.Length == body.Length,
-                out body) &&
+            string target = tokens[0];
+            if (!ReadName(target) || target.Equals("xml", StringComparison.CurrentCultureIgnoreCase))
+                return false;
             // (S (Char* - (Char* '?>' Char*)))
             // S
-            ReturnAndInitialze((out str) =>
-                    str = toCheckString.TrimStart(Constants.whiteSpace),
-                out string leftOver,
-                    () => toCheckString.StartsWithAny(Constants.whiteSpace)
-                ) &&
+            body = body.RemoveFirst(target).TrimStart(Constants.whiteSpace);
             // (Char* - (Char* '?>' Char*))
-            body.AllAsString(ValidateCharacter) && !body.Contains("?>");
+            return body.AllAsString(ValidateCharacter) && !body.Contains("?>");
+        }
 
         // S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
         private bool ReadVersionInfo(string toCheckString) =>

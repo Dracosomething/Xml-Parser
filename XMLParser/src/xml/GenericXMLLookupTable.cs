@@ -42,7 +42,7 @@
                 new Dictionary<string, Func<string, bool>>()
                 {
                     { "char"            , ValidateCharacter                 },
-                    { "space"           , IsSpace                           },
+                    { "s"               , IsSpace                           },
                     { "restrictedchar"  , IsRestrictedCharacter             },
                     { "namestartchar"   , ReadNameStartCharacter            },
                     { "namechar"        , ReadNameCharacter                 },

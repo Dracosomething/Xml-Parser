@@ -26,17 +26,25 @@ namespace XmlParser.src.xml
         internal XMLFile Parse()
         {
             string text = RemoveComments(PreProcess(Normalize(File.ReadAllText(file.FullName))));
-            var readProlog = table["prolog"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("prolog"));
-            // split at end of xml decleration
-            // read xmldecleration seperate from the xml decleration
-            if (!text.StartsWith(readProlog))
-                throw new FormatException("File does not start with a prologue.");
-            var reader = new FileReader(text);
-            string prolog = reader.Read(readProlog);
-            var metaData = ParseProlog(prolog);
 
-            var readBody = table["element"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("element"));
-            string body = reader.Read(readBody);
+            var reader = new FileReader(text);
+
+            // parse the xml decleration
+            XMLMetaData? metaData = null;
+            if (HasXMLDecleration(text))
+                metaData = ParseXMLDecleration(ref reader);
+
+            // handle possible new string encoding
+            string leftOver = reader.LeftOver;
+            if (metaData != null)
+            {
+                byte[] bytes = Encoding.Default.GetBytes(leftOver);
+                leftOver = metaData.Encoding.GetString(bytes);
+            }
+
+            // process all the processing instructions
+            string body = ProcessProcessingInstructions(leftOver); // process all processing instructions,
+                                                                   // after this there can be no more processing instructions in the file
             var rootElement = ParseBody(body);
             return new XMLFile
             {
@@ -46,6 +54,7 @@ namespace XmlParser.src.xml
             };
         }
 
+        #region Pre parsing
         private string Normalize(string text) =>
             Utils.RegexReplace(text.Replace("\r\n", "\n"), "\n", @"\r(?!\n)");
 
@@ -72,59 +81,57 @@ namespace XmlParser.src.xml
             }
         }
 
-        private void ParseMisc(ref readonly FileReader reader)
+        private string ProcessProcessingInstructions(string text)
         {
-            var readMisc = genericTable["Misc"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("Misc"));
-            var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
-            while (!reader.EndOfFile)
+            while (true)
             {
-                string line = reader.Read(readMisc);
-                switch (line)
-                {
-                    case var _ when readPI(line):
-                        ParseProcessingInstruction(line);
-                        continue;
-                    case var _ when line.Trim(Constants.whiteSpace) == string.Empty:
-                        continue;
-                    default:
-                        throw new FormatException("Misc was not in the correct format.");
-                }
+                int startIndex = text.IndexOf("<?");
+                if (startIndex == -1)
+                    return text;
+                int endIndex = text.IndexOf("?>");
+                if (endIndex <= startIndex || endIndex == -1)
+                    throw new FormatException($"Couldn't find the end of a processing instruction. startIndex:{startIndex}, endIndex:{endIndex}, text:{text}");
+                string processingInstruction = text.Substring(new Range { StartIndex = startIndex, EndIndex = endIndex + 2 });
+                ParseProcessingInstruction(processingInstruction);
+                text = text.Replace(processingInstruction, "").Trim(Constants.whiteSpace);
             }
         }
+        #endregion
 
-        private XMLMetaData ParseProlog(string text)
+        #region Metadata
+        private XMLMetaData ParseXMLDecleration(ref readonly FileReader reader)
         {
-            var readXmlDecl = table["XMLDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("XMLDecl"));
-            var reader = new FileReader(text);
-            string xmlDecl = reader.Read(readXmlDecl);
+            var readVerInfo = genericTable["VersionInfo"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("VersionInfo"));
+            var readEncoding = genericTable["EncodingDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("EncodingDecl"));
+            var readStandAlone = table["SDDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("SDDecl"));
 
+            // initialize required variables
             XMLVersion version = XMLVersion.XML10;
             Encoding encoding = Encoding.UTF8;
             bool standalone = true;
-            if (readXmlDecl(xmlDecl))
+            if (!reader.Skip(5))
+                throw new FormatException("The xml decleration does not have the correct length.");
+
+            string versionInfo = reader.Read(readVerInfo);
+            if (!readVerInfo(versionInfo))
+                throw new FormatException("Could not find version info in xml decleration. versionInfo:" + versionInfo);
+            version = ReadVersion(versionInfo);
+            if (version == XMLVersion.XML11)
             {
-                xmlDecl = xmlDecl.Substring(5, xmlDecl.EndIndex);
-                var declarationReader = new FileReader(xmlDecl);
-
-                var readVerInfo = genericTable["VersionInfo"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("VersionInfo"));
-                var readEncoding = genericTable["EncodingDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("EncodingDecl"));
-                var readStandAlone = genericTable["SDDecl"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("SDDecl"));
-
-                string versionInfo = declarationReader.Read(readVerInfo);
-                if (!readVerInfo(versionInfo))
-                    throw new FormatException("Could not find version info in xml decleration. versionInfo:" + versionInfo);
-                version = ReadVersion(versionInfo);
-
-                string encodingDecleration = declarationReader.Read(readEncoding);
-                if (readEncoding(encodingDecleration))
-                    encoding = ReadEncoding(encodingDecleration);
-
-                string standaloneDecleration = declarationReader.Read(readStandAlone);
-                if (readStandAlone(standaloneDecleration))
-                    standalone = ReadStandalone(standaloneDecleration);
+                this.genericTable = new(false);
+                this.table = new(false);
             }
 
-            ParseMisc(ref reader);
+            string encodingDecleration = reader.Read(readEncoding);
+            if (readEncoding(encodingDecleration))
+                encoding = ReadEncoding(encodingDecleration);
+
+            string standaloneDecleration = reader.Read(readStandAlone);
+            if (readStandAlone(standaloneDecleration))
+                standalone = ReadStandalone(standaloneDecleration);
+
+            reader.Trim();
+            reader.Skip(2);
 
             return new XMLMetaData { Version = version, Encoding = encoding, Standalone = standalone };
         }
@@ -136,8 +143,10 @@ namespace XmlParser.src.xml
             ReadMetaDataAttributeValue(encodingDecleration, "EncodingDecl", Encoding.GetEncoding);
 
         private bool ReadStandalone(string standaloneDecleration) =>
-            ReadMetaDataAttributeValue(standaloneDecleration, "SDDecl", (value) => value.Replace("'", "").Replace("\"", "") == "yes");
+            ReadMetaDataAttributeValue(standaloneDecleration, "SDDecl", (value) => value == "yes");
+        #endregion
 
+        #region Parsing
         private XMLElement ParseBody(string body) =>
             ParseElement(body);
 
@@ -281,11 +290,12 @@ namespace XmlParser.src.xml
             var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
             if (!readPI(instruction))
                 throw new FormatException("Processing instruction was in an invalid format. Instruction:" + instruction);
-            var match = instruction.FirstMatch(genericTable["PITarget"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PITarget")));
-            if (!match.Found || match.StartIndex < 2)
+            instruction = instruction.RemoveFirst("<?").RemoveLast("?>");
+            string[] tokens = instruction.Split(Constants.whiteSpace, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length < 1)
                 throw new FormatException("Processing instruction does not have a target at the corrent position. Instruction:" + instruction);
-            string name = instruction.Substring(match);
-            string body = instruction.Substring(match.EndIndex).Replace("?>", "");
+            string name = tokens[0];
+            string body = instruction.RemoveFirst(name);
             this.processingInstructions.Add(new XMLProcessingInstruction { PITarget = name, Data = body });
         }
 
@@ -305,8 +315,16 @@ namespace XmlParser.src.xml
             if (!func(attribute))
                 throw new FormatException($"{tableKey} is not in a valid format. attribute:" + attribute);
             int equalsIndex = attribute.IndexOf('=');
-            string data = attribute.Substring(equalsIndex).TrimStart(Constants.whiteSpace);
+            string data = attribute.Substring(equalsIndex + 1).TrimStart(Constants.whiteSpace).RemoveFirst().RemoveLast();
             return output(data);
         }
+
+        private bool HasXMLDecleration(string text)
+        {
+            bool startsWithxml = text.StartsWith("<?xml");
+            string startOfData = text.RemoveFirst("<?xml");
+            return startsWithxml && startOfData.StartsWithAny(Constants.whiteSpace);
+        }
+        #endregion
     }
 }

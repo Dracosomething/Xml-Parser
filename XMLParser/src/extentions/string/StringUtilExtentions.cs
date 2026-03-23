@@ -22,22 +22,28 @@ namespace XmlParser.src.extentions.@string
 
             public string Substring(Range range) => str.Substring(range.StartIndex, range.Length);
 
+            public string RemoveFirst(int length = 1)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(length, 1, nameof(length));
+                return str.Remove(0, length);
+            }
+
             public string RemoveLast(int length = 1)
             {
-                ArgumentOutOfRangeException.ThrowIfLessThan(length, 1, "length");
+                ArgumentOutOfRangeException.ThrowIfLessThan(length, 1, nameof(length));
                 return str.Remove(str.Length - length);
             }
 
             public string RemoveFirst(string toRemove)
             {
-                ArgumentNullException.ThrowIfNullOrEmpty(toRemove, "toRemove");
+                ArgumentNullException.ThrowIfNullOrEmpty(toRemove, nameof(toRemove));
                 int startIndex = str.IndexOf(toRemove);
                 return str.Remove(startIndex, toRemove.Length);
             }
 
             public string RemoveLast(string toRemove)
             {
-                ArgumentNullException.ThrowIfNullOrEmpty(toRemove, "toRemove");
+                ArgumentNullException.ThrowIfNullOrEmpty(toRemove, nameof(toRemove));
                 int startIndex = str.LastIndexOf(toRemove);
                 return str.Remove(startIndex, toRemove.Length);
             }
@@ -46,10 +52,7 @@ namespace XmlParser.src.extentions.@string
 
             public bool StartsWithAny(ReadOnlySpan<char> sequence)
             {
-                string regex = "[";
-                for (int i = 0; i < sequence.Length; i++)
-                    regex += sequence[i];
-                regex += "]";
+                string regex = $"[{sequence}]+";
                 var match = Regex.Match(str, regex);
                 return match.Success && match.Index == 0;
             }

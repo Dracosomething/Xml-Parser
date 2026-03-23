@@ -35,7 +35,7 @@ namespace XmlParser.src.xml
                     { "chardata"        , ReadCharacterData                 },
                     { "cdsect"          , ReadCharacterDataSection          },
                     { "prolog"          , ReadProlog                        },
-                    { "xmldecleration"  , ReadXMLDeclreration               },
+                    { "xmldecl"         , ReadXMLDeclreration               },
                     { "sddecl"          , ReadstandaloneDocumentDecleration },
                     { "element"         , ReadElement                       },
                     { "stag"            , ReadStartTag                      },
@@ -114,48 +114,46 @@ namespace XmlParser.src.xml
         // EmptyElemTag | STag content ETag 
         private bool ReadElement(string toCheckString) =>
             ReadEmptyElementTag(toCheckString) ||
-        // fix this by getting the first instance of '>' and then checking if from start to that pos is equal to a start tag
-        // then get the last index of  '<' and substring it there to check if it is equal to an end tag
-        // lastly check if everything inbetween is equal to content
-        /*(CheckReference(toCheckString, ReadStartTag, 4, out toCheckString) &&
-         CheckReference(toCheckString, ReadContent, -1, out toCheckString) &&
-         CheckReference(toCheckString, ReadEndTag, 4, out toCheckString));*/
-        Return(() =>
-            {
-                int endPosStartingTag = toCheckString.IndexOf('>');
-                if (endPosStartingTag == -1)
-                    return false;
-                string startTag = toCheckString[..endPosStartingTag];
-                if (!ReadStartTag(startTag))
-                    return false;
-                string contentAndEndTag = toCheckString[endPosStartingTag..];
-                int startPosClosingTag = contentAndEndTag.LastIndexOf("<");
-                if (startPosClosingTag == -1)
-                    return false;
-                string endTag = contentAndEndTag[startPosClosingTag..];
-                if (!ReadEndTag(endTag))
-                    return false;
-                string content = contentAndEndTag[..startPosClosingTag];
-                if (!ReadContent(content))
-                    return false;
-                return true;
-            });
+            Return(() =>
+                {
+                    int endPosStartingTag = toCheckString.IndexOf('>');
+                    if (endPosStartingTag == -1)
+                        return false;
+                    string startTag = toCheckString.Substring(0, endPosStartingTag + 1);
+                    if (!ReadStartTag(startTag))
+                        return false;
+                    string contentAndEndTag = toCheckString.RemoveFirst(startTag);
+                    int startPosClosingTag = contentAndEndTag.LastIndexOf("<");
+                    if (startPosClosingTag == -1)
+                        return false;
+                    string endTag = contentAndEndTag[startPosClosingTag..];
+                    if (!ReadEndTag(endTag))
+                        return false;
+                    string content = contentAndEndTag[..startPosClosingTag];
+                    if (!ReadContent(content))
+                        return false;
+                    return true;
+                });
 
         // '<' Name (S Attribute)* S? '>'
         private bool ReadStartTag(string toCheckString) =>
             ReadTag(toCheckString, ">");
 
         // Name Eq AttValue
-        private bool ReadAttribute(string toCheckString) =>
-            AssertMinLength(toCheckString, 4) &&
-            CheckAllRefernces(toCheckString, [
-                GenericXMLLookupTable["Name"],
-                GenericXMLLookupTable["Eq"],
-                GenericXMLLookupTable["AttValue"]
-            ], [1, 1, 2], out toCheckString) &&
-            toCheckString == string.Empty;
+        private bool ReadAttribute(string toCheckString)
+        {
+            if (!AssertMinLength(toCheckString, 4))
+                return false;
+            string[] pair = toCheckString.Split('=', 2);
+            if (pair.Length != 2)
+                return false;
+            string name = pair[0].Trim(Constants.whiteSpace);
+            string value = pair[1].Trim(Constants.whiteSpace);
+            return GenericXMLLookupTable["Name"](name) && GenericXMLLookupTable["AttValue"](value);
+        }
 
         // '</' Name S? '>'
+        // needs fixing
         private bool ReadEndTag(string toCheckString) =>
             AssertContainedAndUpdate(toCheckString, 4, "</", ">", out string data) &&
             CheckReference(data, GenericXMLLookupTable["Name"], 1, out data) &&
@@ -206,28 +204,43 @@ namespace XmlParser.src.xml
         {
             if (!AssertContainedAndUpdate(toCheckString, 4, "<", close, out string body))
                 return false;
-            if (!CheckReference(body, GenericXMLLookupTable["Name"], match => match.StartIndex != 0,
-                match => true,
-                out body))
+            // todo; dont use check reference
+            string[] tokens = body.Split(Constants.whiteSpace, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length < 1)
                 return false;
-            // read space and check if there is still space left in the string
-            string tmp = body.TrimStart(Constants.whiteSpace);
-            if (tmp == string.Empty)
-                return true;
+            string name = tokens[0];
+            if (!GenericXMLLookupTable["name"](name))
+                return false;
+            // get all attributes using body
+            body = body.RemoveFirst(name).TrimEnd(Constants.whiteSpace);
             // first remove the trailing space
             // then we can maybe loop while the string is not empty
             // if something is not true
             // return false
             // otherwise return true
-            body = body.TrimEnd(Constants.whiteSpace);
-            string[] attributes = body.Split(Constants.whiteSpace, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < attributes.Length; i++)
+            while (true)
             {
-                string attribute = attributes[i];
-                if (!ReadAttribute(attribute))
+                // trim whitespace
+                body = body.TrimStart(Constants.whiteSpace);
+                // get the position at where we'll split
+                int equalsIndex = body.IndexOf('=');
+                if (equalsIndex == -1)
+                    return true;
+                // get the name of the attribute and validate it
+                string attributeName = body.Substring(0, equalsIndex).TrimEnd(Constants.whiteSpace);
+                if (!GenericXMLLookupTable["name"](attributeName))
                     return false;
+                // update body
+                body = body.Substring(equalsIndex + 1).TrimStart(Constants.whiteSpace);
+                // get the value of the attribute and validate it
+                char quote = body.First();
+                int valueLen = body.Substring(1).IndexOf(quote) + 2;
+                string value = body.Substring(0, valueLen);
+                if (!GenericXMLLookupTable["AttValue"](value))
+                    return false;
+                // update body again
+                body = body.RemoveFirst(value);
             }
-            return toCheckString.EndsWith(GenericXMLLookupTable["S"]);
         }
     }
 }

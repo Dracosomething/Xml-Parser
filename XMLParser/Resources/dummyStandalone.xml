@@ -11,3 +11,4 @@
 	</text>
 	<to xml:lang="en">Elvis</to>
 </greeting>
+<?pi-target name="tmp"?>

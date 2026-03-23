@@ -81,6 +81,14 @@ namespace XmlParser.src
             return true;
         }
 
+        public void Trim()
+        {
+            int startLen = this.text.Length;
+            int endLen = this.text.TrimStart(Constants.whiteSpace).Length;
+            int toAdd = endLen - startLen;
+            this.index += toAdd;
+        }
+
         private Match ReadFirstMatch(Func<string, bool> func)
         {
             // We only need to check the part of the file data that hasn't been read yet.

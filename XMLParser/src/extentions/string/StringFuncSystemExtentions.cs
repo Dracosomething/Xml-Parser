@@ -10,7 +10,7 @@
             /// <param name="func"></param>
             /// <param name="start"></param>
             /// <returns></returns>
-            // todo: add an option to loop ones
+            // don work rn
             public Match FirstMatch(Func<string, bool> func, int start = 0, bool referce = false)
             {
                 // validate the arguemnts
@@ -39,35 +39,10 @@
                 }
             }
 
-            public string Substring(Func<string, bool> func, int start = 0)
-            {
-                var match = str.FirstMatch(func, start);
-                if (match.Found)
-                    return string.Empty;
-                return match.Result;
-            }
-
-            public bool Contains(Func<string, bool> func)
-            {
-                for (int i = 0; i < str.Length; i++)
-                {
-                    var match = str.FirstMatch(func, i, true);
-                    if (match.Found)
-                        return true;
-                }
-                return false;
-            }
-
             public bool StartsWith(Func<string, bool> func)
             {
                 var match = str.FirstMatch(func);
                 return match.Found && match.StartIndex == 0;
-            }
-
-            public bool EndsWith(Func<string, bool> func)
-            {
-                var match = str.FirstMatch(func, 0, true);
-                return match.Found && match.EndIndex == str.Length - 1;
             }
 
             public bool AllAsString(Func<string, bool> predicate)
