@@ -9,7 +9,7 @@ namespace XmlParser.src.extentions
             public static WhiteSpaceHandling FromString(string text) => text.ToLower() switch
             {
                 "default" => WhiteSpaceHandling.DEFAULT,
-                "preserved" => WhiteSpaceHandling.PRESERVED,
+                "preserve" => WhiteSpaceHandling.PRESERVED,
                 _ => throw new ArgumentException($"{text} is not a valid method of whitespace handling.")
             };
         }

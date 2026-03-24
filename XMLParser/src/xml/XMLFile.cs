@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using XmlParser.src.extentions;
 
 namespace XmlParser.src.xml
 {
@@ -18,7 +19,7 @@ namespace XmlParser.src.xml
                 .Append(", Root: ")
                 .Append(Root)
                 .Append(", ProcessingInstructions: ")
-                .Append(ProcessingInstructions);
+                .Append(ProcessingInstructions.AsString());
 
             return builder.Append(" }").ToString();
         }

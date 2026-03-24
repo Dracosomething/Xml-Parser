@@ -5,7 +5,7 @@ namespace XmlParser.src.extentions
 {
     internal static class IEnumerableExtentions
     {
-        public static string ToString<T>(this IEnumerable<T> self)
+        public static string AsString<T>(this IEnumerable<T> self)
         {
             var builder = new StringBuilder("[");
             foreach (var item in self)

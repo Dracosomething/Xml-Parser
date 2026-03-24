@@ -4,10 +4,22 @@
 <greeting authur="John"
 		  date=  "16/03/2026 16:48"		
 		  >
+	<meta-data folder="hello world" size="639"/>
 	<text xml:space="preserve">
 		<![CDATA[<example cdata woaw>]]> and more normal text
 		even whitespaces, genues text.
 		&lt;text&gt;
+		<innerText xml:space="default">
+			abcdefg <innerText>
+				efghjks
+			</innerText>
+		</innerText>
+		<innerText xml:space="default">
+			hdfsdf1234 34   
+			
+			
+			oewrwer
+		</innerText>
 	</text>
 	<to xml:lang="en">Elvis</to>
 </greeting>

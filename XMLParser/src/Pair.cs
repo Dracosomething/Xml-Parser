@@ -12,10 +12,10 @@ namespace XmlParser.src.xml
         public V? Value { get; init; }
 
         public override string ToString() =>
-            new StringBuilder("[")
+            new StringBuilder("{ ")
             // if Key is null append a string literal "null" otherwise turn Key into a string.
             .Append(Key == null ? "null" : Key.ToString()).Append(", ")
-            .Append(Value == null ? "null" : Value.ToString()).Append("]")
+            .Append(Value == null ? "null" : Value.ToString()).Append(" }")
             .ToString();
 
         public static implicit operator Pair<K, V>(KeyValuePair<K, V> pair) => new Pair<K, V> { Key = pair.Key, Value = pair.Value };

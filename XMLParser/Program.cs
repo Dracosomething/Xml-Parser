@@ -49,6 +49,7 @@ namespace XmlParser
                 var processed = parser.Parse();
                 writer.WriteLine($"end: {end = DateTime.Now}");
                 var duration = start.Subtract(end);
+                // add pretty print option 
                 writer.WriteLine($"took {duration} to compute {processed}");
             }
 

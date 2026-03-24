@@ -52,8 +52,13 @@ namespace XmlParser.src.xml
             ReadMultipleTokens(toCheckString, ' ', ReadName);
 
         // '"' ([^<&"] | Reference)* '"' | "'" ([^<&'] | Reference)* "'"
-        private bool ReadAttributeValue(string toCheckString) =>
-            ReadQuoted(toCheckString, (quote) => $"[^<{quote}]*");
+        private bool ReadAttributeValue(string toCheckString)
+        {
+            toCheckString = ValidateReferences(toCheckString, out bool success);
+            if (!success)
+                return false;
+            return ReadQuoted(toCheckString, (quote) => $"[^<&{quote}]*");
+        }
 
         // ('"' [^"]* '"') | ("'" [^']* "'")
         private bool ReadSystemLiteral(string toCheckString) =>
@@ -197,6 +202,32 @@ namespace XmlParser.src.xml
             if (!AssertQuotedAndUpdate(leftOver, out leftOver))
                 return false;
             return valueCheck(leftOver);
+        }
+
+        // checks if all the references in the string are properly formatted and removes those
+        public string ValidateReferences(string toCheckString, out bool success)
+        {
+            success = true;
+            while (true)
+            {
+                int startReferenceIndex = toCheckString.IndexOf("&");
+                if (startReferenceIndex == -1)
+                    return toCheckString;
+                string tmp = toCheckString.Substring(startReferenceIndex);
+                int endReferenceIndex = tmp.IndexOf(";");
+                if (endReferenceIndex == -1)
+                {
+                    success = false;
+                    return string.Empty;
+                }
+                string reference = tmp.Substring(0, endReferenceIndex + 1);
+                if (!ReadReference(reference))
+                {
+                    success = false;
+                    return string.Empty;
+                }
+                toCheckString = toCheckString.RemoveFirst(reference);
+            }
         }
     }
 }

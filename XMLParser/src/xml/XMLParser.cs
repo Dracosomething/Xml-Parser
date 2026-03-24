@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using XmlParser.src.extentions;
 using XmlParser.src.extentions.@string;
 
@@ -25,7 +26,8 @@ namespace XmlParser.src.xml
 
         internal XMLFile Parse()
         {
-            string text = RemoveComments(PreProcess(Normalize(File.ReadAllText(file.FullName))));
+            // remove the pre process from here and call it on the text where a reference is possible
+            string text = RemoveComments(Normalize(File.ReadAllText(file.FullName)));
 
             var reader = new FileReader(text);
 
@@ -43,8 +45,9 @@ namespace XmlParser.src.xml
             }
 
             // process all the processing instructions
-            string body = ProcessProcessingInstructions(leftOver); // process all processing instructions,
-                                                                   // after this there can be no more processing instructions in the file
+            string body = ProcessProcessingInstructions(leftOver).Trim(Constants.whiteSpace); // process all processing instructions,
+                                                                                              // after this there can be no more processing
+                                                                                              // instructions in the file
             var rootElement = ParseBody(body);
             return new XMLFile
             {
@@ -159,28 +162,33 @@ namespace XmlParser.src.xml
             var emptyElement = table["EmptyElemTag"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("EmptyElemTag"));
             var reader = new FileReader(element);
             if (emptyElement(element))
-                return ParseOpeningTag(element, in reader);
+                return ParseOpeningTag(element);
 
             var readStartTag = table["STag"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("STag"));
             string openingTag = reader.Read(readStartTag);
             if (!readStartTag(openingTag))
                 throw new FormatException("openingTag is not int the correct format for a starting tag. openingTag:" + openingTag);
 
-            var startingTagData = ParseOpeningTag(openingTag, in reader);
+            var startingTagData = ParseOpeningTag(openingTag);
             var readEndingTag = table["ETag"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("ETag"));
 
             string leftOverData = reader.LeftOver;
             // remove spaces and closing '>'
-            leftOverData = leftOverData.TrimStart(Constants.whiteSpace).Remove(0, 1);
             if (readEndingTag(leftOverData))
                 return startingTagData;
 
-            reader = new FileReader(leftOverData);
+            // get the last index of "</"
+            int endIndex = leftOverData.LastIndexOf("</");
+            if (endIndex == -1)
+                throw new FormatException("No closing tag could be found. element:" + element);
+
             var readContent = table["content"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("content"));
-            string body = reader.Read(readContent);
+            string body = leftOverData.Substring(0, endIndex);
             if (!readContent(body))
                 throw new FormatException("content is in the wrong format. body:" + body);
-            var data = ParseXMLElementContent(body);
+            // parse the elements content
+            var data = ParseXMLElementContent(body, startingTagData.Space);
+
             return new XMLElement
             {
                 Name = startingTagData.Name,
@@ -192,12 +200,25 @@ namespace XmlParser.src.xml
             };
         }
 
-        private XMLElement ParseOpeningTag(string tag, in FileReader reader)
+        private XMLElement ParseOpeningTag(string tag)
         {
             var readName = genericTable["Name"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("Name"));
 
-            string name = reader.Read(readName);
-            string attributesAsString = reader.LeftOver.RemoveLast(2);
+            // todo: fix this function by having it split at the whitespace, removing empty entries and only allowing 2 entries
+            string[] pair = tag.Split(Constants.whiteSpace, 2, StringSplitOptions.RemoveEmptyEntries);
+            if (pair.Length == 1)
+            {
+                return new XMLElement
+                {
+                    // it just has a name
+                    Name = tag.RemoveFirst().RemoveLast().TrimEnd(Constants.whiteSpace)
+                };
+            }
+
+            string name = pair[0].RemoveFirst();
+            if (!readName(name))
+                throw new FormatException("name is not using the characters allowed in names. name:" + name);
+            string attributesAsString = pair[1];
             var attributes = ParseAttributes(attributesAsString);
 
             CultureInfo? language = null;
@@ -207,7 +228,7 @@ namespace XmlParser.src.xml
                 attributes.Remove("xml:lang");
             }
 
-            WhiteSpaceHandling? handling = null;
+            WhiteSpaceHandling handling = WhiteSpaceHandling.DEFAULT;
             if (attributes.ContainsKey("xml:space"))
             {
                 handling = WhiteSpaceHandling.FromString(attributes["xml:space"]);
@@ -220,68 +241,113 @@ namespace XmlParser.src.xml
         private Dictionary<string, string> ParseAttributes(string attributes)
         {
             var dic = new Dictionary<string, string>();
-            string[] attributesAsArray = attributes.Split(Constants.whiteSpace, StringSplitOptions.RemoveEmptyEntries);
             // walk through attriutesAsArray with for loop and parse em individually
-            for (int i = 0; i < attributesAsArray.Length; i++)
-                dic.Add(ParseAttribute(attributesAsArray[i], in dic));
+            while (true)
+            {
+                // get the position at where we'll split
+                int equalsIndex = attributes.IndexOf('=');
+                if (equalsIndex == -1)
+                    break;
+                string tmp = attributes.Substring(equalsIndex);
+                // get the value of the attribute and validate it
+                char quote = tmp.RemoveFirst().TrimStart(Constants.whiteSpace).First();
+                int valueLen = tmp.IndexOf(quote, tmp.IndexOf(quote) + 1) + 1;
+                // update body again
+                int length = equalsIndex + valueLen;
+                string attribute = attributes.Substring(0, length);
+                dic.Add(ParseAttribute(attribute, ref dic));
+                attributes = attributes.RemoveFirst(attribute).TrimStart(Constants.whiteSpace);
+            }
             return dic;
         }
 
         private Pair<string, string> ParseAttribute(string attribute, ref readonly Dictionary<string, string> dic)
         {
-            string[] pair = attribute.Split('=', 1);
+            string[] pair = attribute.Split('=', 2);
             ArgumentOutOfRangeException.ThrowIfNotEqual(pair.Length, 2, "pair");
             string name = pair[0].TrimEnd(Constants.whiteSpace);
             if (dic.ContainsKey(name))
                 throw new DuplicateNameException($"Key: {name} already exists on attribute.");
             string valueQuoted = pair[1].TrimStart(Constants.whiteSpace);
-            string value = valueQuoted.Substring(new Range { StartIndex = 1, EndIndex = valueQuoted.EndIndex - 1 });
+            string value = PreProcess(valueQuoted.Substring(new Range { StartIndex = 1, EndIndex = valueQuoted.EndIndex }));
             return new Pair<string, string> { Key = name, Value = value };
         }
 
-        private XMLData ParseXMLElementContent(string content)
+        private XMLData ParseXMLElementContent(string content, WhiteSpaceHandling whiteSpaceHandling)
         {
             var readContent = table["content"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("content"));
             if (!readContent(content))
                 throw new FormatException("content is in the wrong format. content:" + content);
 
-            // we want to handle the character data like normal text
-            // any encountered xml elements should be parsed on their own and then added to the elements
-            // all the character data sections should be treated like normal text
-            // processing instructions should be treated like normal processing instructions
-            // comments should be ignored
-            var readPI = genericTable["PI"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("PI"));
-            var readElement = table["element"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("element"));
-            var readCDSect = table["CDSect"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("CDSect"));
-            bool readData(string line) => readPI(line) || readCDSect(line) || readElement(line);
-
-            var readCharData = table["CharData"] ?? throw new KeyNotFoundException(Utils.GeneralizedKeyNotFoundMessage("CharData"));
-            var reader = new FileReader(content);
             string text = "";
             List<XMLElement> elements = new();
-            while (!reader.EndOfFile)
+            /* stream for parsing element content
+             *  loop untill everything is parsed
+             *      get index of '<'
+             *      if index is -1
+             *          just parse everything as normal text, preprocess and handle whitespace properly
+             *      end if
+             *      get everything before index
+             *      parse before as normal text
+             *      if character after index is '!'
+             *          get everything inbetween <![CDATA[ and ]]>
+             *          parse that as normal text without any extra processing
+             *          remove section from content
+             *      otherwise
+             *          read the entire tag
+             *          if the tag ends with '/>'
+             *              parse tag and add to elements
+             *          otherwise
+             *              get index of closing tag and of next opening tag
+             *              if opening tag is before closing tag and there is another opening tag
+             *                  read each nested opening tag untill the correct closing tag
+             *              otherwise
+             *                  extract the element and parse it
+             *              end if
+             *          end if
+             *          remove element from content
+             *      end if
+             *      remove normal text from content
+             *  end loop
+             */
+            for (int i = 0; i < content.Length; i++)
             {
-                if (reader.LeftOver.StartsWith(readCharData))
+                int tagIndex = content.IndexOf('<');
+                if (tagIndex == -1)
                 {
-                    text += reader.Read(readCharData);
-                    continue;
+                    text += FormatTextData(content, whiteSpaceHandling);
+                    break;
                 }
-                string data = reader.Read(readData);
-                if (!readData(data))
-                    throw new FormatException("data is not a comment, processing instruction, element or character data section. data:" + data);
-                switch (data)
+                string textData = content.Substring(0, tagIndex);
+                text += FormatTextData(textData, whiteSpaceHandling);
+                if (content[tagIndex + 1] == '!')
                 {
-                    case var _ when readPI(data):
-                        ParseProcessingInstruction(data);
-                        break;
-                    case var _ when readCDSect(data):
-                        text += ParseCharacterDataSection(data);
-                        break;
-                    case var _ when readElement(data):
-                        elements.Add(ParseElement(data));
-                        break;
+                    int closingIndex = content.IndexOf("]]>");
+                    if (closingIndex == -1)
+                        throw new FormatException("CDATA section does not close. content:" + content);
+                    string section = content.Substring(new Range { StartIndex = tagIndex, EndIndex = closingIndex + 3 });
+                    string data = ParseCharacterDataSection(section);
+                    text += data;
+                    content = content.RemoveFirst(section);
                 }
+                else
+                {
+                    int closingIndex = content.IndexOf(">");
+                    if (closingIndex == -1)
+                        throw new FormatException("Element does not have a closing '>'. content:" + content);
+                    string tag = content.Substring(new Range { StartIndex = tagIndex, EndIndex = closingIndex + 1 });
+                    if (tag.EndsWith("/>"))
+                        elements.Add(ParseOpeningTag(tag));
+                    else
+                    {
+                        tag = ExtractChildElement(content, tag);
+                        elements.Add(ParseElement(tag));
+                    }
+                    content = content.RemoveFirst(tag);
+                }
+                content = content.RemoveFirst(textData);
             }
+
             return new XMLData { Text = text, Children = elements };
         }
 
@@ -318,6 +384,7 @@ namespace XmlParser.src.xml
             string data = attribute.Substring(equalsIndex + 1).TrimStart(Constants.whiteSpace).RemoveFirst().RemoveLast();
             return output(data);
         }
+        #endregion
 
         private bool HasXMLDecleration(string text)
         {
@@ -325,6 +392,79 @@ namespace XmlParser.src.xml
             string startOfData = text.RemoveFirst("<?xml");
             return startsWithxml && startOfData.StartsWithAny(Constants.whiteSpace);
         }
-        #endregion
+
+        private string FormatTextData(string textData, WhiteSpaceHandling whiteSpaceHandling)
+        {
+            textData = PreProcess(textData);
+            if (whiteSpaceHandling == WhiteSpaceHandling.DEFAULT)
+                textData = Regex.Replace(textData, @"[\s\n\r\t]+", " ");
+            return textData;
+        }
+
+        private string ExtractChildElement(string parentBody, string tag)
+        {
+            // making everything ready for the actual meat of this function
+            int tagIndex = parentBody.IndexOf(tag);
+            if (tagIndex == -1)
+                throw new ArgumentException($"Argument:tag, value:{tag} does not exist in parentBody. parentBody:{parentBody}");
+            string tagName = tag.Split(Constants.whiteSpace, 2, StringSplitOptions.RemoveEmptyEntries)[0].RemoveFirst().TrimEnd(Constants.whiteSpace);
+            string leftOver = parentBody.Substring(tagIndex + tag.Length);
+            string closingTag = $"</{tagName}";
+            string openingTag = $"<{tagName}";
+            /*
+             *  get index of closing tag and of next opening tag
+             *  if opening tag is before closing tag and there is another opening tag
+             *      do
+             *          read index of opening tag
+             *          read index of closing tag
+             *          if opening tag is before closing tag
+             *              decrement nesting count by 1
+             *              skip closing tag
+             *          otherwise
+             *              increment nesting count by 1
+             *              skip opening tag
+             *          end if
+             *      while nesting count is 0 or less
+             *      extract from tag index to closing tag index
+             *  otherwise
+             *      from closing index get first index of '>'
+             *      add closing index to '>' index
+             *      extract from leftOver untill end index
+             *      combine tag and body
+             *  end if
+             */
+            int closingIndex = leftOver.IndexOf(closingTag);
+            int openingIndex = leftOver.IndexOf(openingTag);
+            if (openingIndex != -1 || openingIndex > closingIndex)
+            {
+                int nestingCount = 1;
+                int endIndex;
+                var reader = new FileReader(leftOver);
+                do
+                {
+                    string tmp = reader.LeftOver;
+                    openingIndex = tmp.IndexOf(openingTag);
+                    closingIndex = tmp.IndexOf(closingTag);
+                    endIndex = tmp.IndexOf('>') + 1;
+                    if (closingIndex > openingIndex)
+                    {
+                        nestingCount++;
+                        reader.Skip(new Range { StartIndex = openingIndex, EndIndex = endIndex });
+                    }
+                    else
+                    {
+                        nestingCount--;
+                        reader.Skip(new Range { StartIndex = closingIndex, EndIndex = endIndex });
+                    }
+                } while (nestingCount > 0);
+                return parentBody.Substring(new Range { StartIndex = tagIndex, EndIndex = reader.Index + tag.Length + tagIndex });
+            }
+            else
+            {
+                int endIndex = leftOver.Substring(closingIndex).IndexOf('>');
+                endIndex += closingIndex;
+                return tag + leftOver.Substring(0, endIndex + 1);
+            }
+        }
     }
 }

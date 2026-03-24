@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using XmlParser.src.extentions;
 
 namespace XmlParser.src.xml
 {
@@ -14,7 +15,7 @@ namespace XmlParser.src.xml
         public required string Name { get; init; }
         public Dictionary<string, string> Attributes { get; init; } = new();
         public CultureInfo? Language { get; init; } = null;
-        public WhiteSpaceHandling? Space { get; init; } = null;
+        public WhiteSpaceHandling Space { get; init; } = WhiteSpaceHandling.DEFAULT;
         public string UnparsedContent { get; init; } = string.Empty;
         public XMLData? ParsedContent { get; init; } = null;
 
@@ -26,7 +27,7 @@ namespace XmlParser.src.xml
                 .Append("Name: ")
                 .Append(Name)
                 .Append(", Attributes: ")
-                .Append(Attributes.ToString())
+                .Append(Attributes.AsString())
                 .Append(", Language: ")
                 .Append(Language == null ? "null" : Language.ToString())
                 .Append(", Space: ")

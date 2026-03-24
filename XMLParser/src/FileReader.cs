@@ -9,6 +9,10 @@ namespace XmlParser.src
 
         public bool EndOfFile => this.index >= this.text.Length - 1;
         public string LeftOver => this.text.Substring(this.index);
+        public int Index
+        {
+            get => index;
+        }
 
         public FileReader(FileInfo info)
         {
@@ -72,6 +76,8 @@ namespace XmlParser.src
             else
                 return Skip(match.StartIndex);
         }
+
+        public bool Skip(Range range) => this.Skip(range.EndIndex);
 
         public bool Back(int amount = 1)
         {

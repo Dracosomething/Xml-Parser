@@ -22,6 +22,8 @@ namespace XmlParser.src.extentions.@string
 
             public string Substring(Range range) => str.Substring(range.StartIndex, range.Length);
 
+            public string Remove(Range range) => str.Remove(range.StartIndex, range.Length);
+
             public string RemoveFirst(int length = 1)
             {
                 ArgumentOutOfRangeException.ThrowIfLessThan(length, 1, nameof(length));
@@ -38,6 +40,8 @@ namespace XmlParser.src.extentions.@string
             {
                 ArgumentNullException.ThrowIfNullOrEmpty(toRemove, nameof(toRemove));
                 int startIndex = str.IndexOf(toRemove);
+                if (startIndex == -1)
+                    return str;
                 return str.Remove(startIndex, toRemove.Length);
             }
 
@@ -45,6 +49,8 @@ namespace XmlParser.src.extentions.@string
             {
                 ArgumentNullException.ThrowIfNullOrEmpty(toRemove, nameof(toRemove));
                 int startIndex = str.LastIndexOf(toRemove);
+                if (startIndex == -1)
+                    return str;
                 return str.Remove(startIndex, toRemove.Length);
             }
 
